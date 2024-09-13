@@ -1,0 +1,18 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden; /* Yatay scroll'u engelle */
+  overflow-y: auto;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1; /* Ana içerik alanı boşluğu kaplar */
+  display: flex;
+  flex-direction: column;
+}

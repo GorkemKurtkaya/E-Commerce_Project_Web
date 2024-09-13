@@ -1,0 +1,8 @@
+ .login {
+  flex: 1;  Ana içeriğin geri kalan tüm boşluğu kaplamasını sağlar 
+  display: flex;
+  flex-direction: column;
+  padding: 1rem; /* İçeriğin etrafına padding ekler */
+  /*margin-top: 3rem; /* Navbar'ın yüksekliğini telafi etmek için üstten boşluk ekler */
+  margin-bottom: 3rem;
+}  
