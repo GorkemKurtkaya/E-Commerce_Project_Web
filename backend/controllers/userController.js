@@ -8,7 +8,7 @@ const registerUser = async (req, res) => {
         const user = await User.create(req.body);
         res.status(201).json({
             succeded: true,
-            user:user._id
+            user: user._id
         });
 
     } catch (error) {
@@ -87,4 +87,50 @@ const createToken = (userId) => {
     });
 }
 
-export { registerUser, loginUser, createToken };
+const logoutUser = (req, res) => {
+    res.cookie("jwt", "", {
+        maxAge: 1
+    });
+    res.redirect("/");
+}
+
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({ _id: { $ne: res.locals.user._id } });
+        res.status(200).render("users", {
+            users,
+            link: "users"
+        });
+    } catch (error) {
+        res.status(400).json({
+            succeded: false,
+            error: error.message
+        });
+    }
+}
+const getAUsers = async (req, res) => {
+    try {
+        const user = await User.findById({ _id: req.params.id });
+        const inFollowers = user.followers.some((follower) => {
+            return follower.equals(res.locals.user._id);
+        });
+        const photos = await Photo.find({ user: user._id });
+        res.status(200).render("user", {
+            user,
+            inFollowers,
+            photos,
+            link: "users"
+        });
+    }
+    catch (error) {
+        res.status(400).json({
+            succeded: false,
+            error: error.message
+        });
+    }
+}
+
+
+
+
+export { registerUser, loginUser, createToken, logoutUser, getAllUsers, getAUsers };

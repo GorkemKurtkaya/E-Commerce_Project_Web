@@ -4,6 +4,7 @@ import conn from './db.js';
 import userRoute from './routes/userRoute.js';
 import { checkUser } from './middlewares/authMiddleWare.js';
 import cookieParser from 'cookie-parser';
+import orderRoute from './routes/orderRoute.js';
 // import methodOverride from 'method-override';
 
 
@@ -33,8 +34,9 @@ app.use(cookieParser());
 // }));
 
 
-app.use('*', checkUser); 
+// app.use('*', checkUser); 
 app.use("/users",userRoute);
+app.use("/orders",orderRoute);
 
 
 

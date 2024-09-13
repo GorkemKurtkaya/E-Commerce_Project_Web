@@ -21,6 +21,12 @@ const userSchema = new Schema({
         required: [true, "Password is required"],
         minLength: [3, "Password must be at least 3 characters long"]
     },
+    purchasedProducts: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Order"
+        }
+    ],
     role: {
         type: String,
         enum: ["user", "admin"],
