@@ -11,7 +11,7 @@ import { FormEvent } from "react";
 import { ProductContext } from "../context/context";
 
 interface LoginProps {
-  onLogin: (userData: { name: string; email: string }) => void;
+  onLogin: (userData: { email: string; password: string }) => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
@@ -57,7 +57,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
         if (user) {
           // Giriş başarılı, kullanıcı bilgilerini burada kullanabilirsiniz
-          console.log("Giriş başarılı:", user);
           setErrors(null); // Hata mesajlarını sıfırlıyoruz
           onLogin(user);
           navigate("/");

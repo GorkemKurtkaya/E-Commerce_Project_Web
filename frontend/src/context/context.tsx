@@ -8,7 +8,7 @@ interface ProductContextType {
   fetchUser: (
     email: string,
     password: string
-  ) => Promise<{ name: string; email: string } | null>;
+  ) => Promise<{ email: string; password: string } | null>;
   fetchSignupUser: (
     name: string,
     email: string,
@@ -119,10 +119,10 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const fetchUser = async (
     email: string,
     password: string
-  ): Promise<{ name: string; email: string } | null> => {
+  ): Promise<{ email: string; password: string } | null> => {
     try {
-      const response = await axios.post("http://0.0.0.0:3000/users/login", {
-        name: email,
+      const response = await axios.post("http://localhost:3000/users/login", {
+        email: email,
         password: password,
       });
 
@@ -135,8 +135,6 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       return null; // Hata durumunda null döndürüyoruz
     }
   };
-
-  
 
   const fetchSignupUser = async (
     name: string,
