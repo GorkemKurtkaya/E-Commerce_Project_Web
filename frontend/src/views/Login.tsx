@@ -85,7 +85,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   <label className="block mb-2 text-[#373A40]">Email</label>
                   <input
                     className="inline-block w-full p-4 leading-6 text-lg placeholder-[#468585] text-[#373A40] bg-white shadow border-2 border-[#468585] rounded focus:outline-none"
-                    type="email"
+                    type="text"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

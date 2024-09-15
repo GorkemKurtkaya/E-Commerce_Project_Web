@@ -1,5 +1,6 @@
 import React, { createContext, useState, ReactNode } from "react";
 import { Product } from "../types/Product"; // Ürün tipini içeri aktarıyoruz
+import axios from "axios";
 
 interface ProductContextType {
   products: Product[];
@@ -8,6 +9,11 @@ interface ProductContextType {
     email: string,
     password: string
   ) => Promise<{ name: string; email: string } | null>;
+  fetchSignupUser: (
+    name: string,
+    email: string,
+    password: string
+  ) => Promise<{ name: string; email: string; password: string } | null>;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -110,58 +116,52 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
-  const fetchUser = (
+  const fetchUser = async (
     email: string,
     password: string
   ): Promise<{ name: string; email: string } | null> => {
-    return new Promise((resolve) => {
-      const staticUsers = [
-        {
-          id: 1,
-          name: "Ömer",
-          email: "asd@example.com",
-          password: "123456",
-        },
-        {
-          id: 2,
-          name: "Fikri",
-          email: "qwe@example.com",
-          password: "1234567",
-        },
-        {
-          id: 3,
-          name: "Ömer Fikri Gülcemal",
-          email: "cnc@example.com",
-          password: "12345678",
-        },
-        {
-          id: 4,
-          name: "Ömer Fikri Gülcemal",
-          email: "123@example.com",
-          password: "123456789",
-        },
-      ];
-      const foundUser = staticUsers.find(
-        (user) => user.email === email && user.password === password
-      );
+    try {
+      const response = await axios.post("http://0.0.0.0:3000/users/login", {
+        name: email,
+        password: password,
+      });
 
-      if (foundUser) {
-        // Eşleşen kullanıcıyı dön
-        const user = {
-          name: foundUser.name,
-          email: foundUser.email,
-        };
-        resolve(user);
-        localStorage.setItem("user", JSON.stringify(user)); // Kullanıcı bilgisini saklıyoruz
-      } else {
-        // Eşleşme yoksa null dön
-        resolve(null);
-      }
-    });
+      console.log("Giriş başarılı", response.data);
+
+      // Eğer başarılıysa, kullanıcı bilgilerini döndür
+      return response.data;
+    } catch (error) {
+      console.error("Giriş sırasında bir hata oluştu:", error);
+      return null; // Hata durumunda null döndürüyoruz
+    }
+  };
+
+  const fetchSignupUser = async (
+    name: string,
+    email: string,
+    password: string
+  ): Promise<{ name: string; email: string; password: string } | null> => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/users/register",
+        {
+          name: name,
+          email: email,
+          password: password,
+        }
+      );
+      console.log("Kayıt Başarılı", response);
+      return response.data;
+    } catch (error) {
+      console.error("Hata:", error);
+      return null;
+    }
   };
 
   return (
-    <ProductContext.Provider value={{ products, fetchProducts, fetchUser }}>
+    <ProductContext.Provider
+      value={{ products, fetchProducts, fetchUser, fetchSignupUser }}
+    >
       {children}
     </ProductContext.Provider>
   );

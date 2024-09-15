@@ -1,8 +1,9 @@
 import "../index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import LeftSide from "../components/LeftSide";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { FormEvent } from "react";
+import { ProductContext } from "../context/context";
 
 function Signup() {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -19,11 +20,14 @@ function Signup() {
     checkbox: "",
   });
 
+  const context = useContext(ProductContext);
+  const fetchSignupUser = context?.fetchSignupUser;
+
   const togglePasswordVisibility = () => {
     setPasswordVisible((passwordVisible) => !passwordVisible);
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     let formIsValid = true;
@@ -72,8 +76,19 @@ function Signup() {
     if (formIsValid) {
       // Formu gönderme işlemi
       console.log("Form gönderildi");
+      if (fetchSignupUser) {
+        const response = await fetchSignupUser(name, email, password1); // fetchUser fonksiyonunu kullanarak giriş yapmayı deniyoruz
+
+        if (response) {
+          // Giriş başarılı, kullanıcı bilgilerini burada kullanabilirsiniz
+          console.log("Kayıt başarılı:", response);
+        } else {
+          // Giriş başarısız, hata mesajı göster
+          console.log("Kayıt Başarısız");
+        }
+      }
     } else {
-      setErrors(newErrors);
+      setErrors(newErrors); // Geçersiz girişler için hata mesajlarını ayarla
     }
   };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,11 +129,6 @@ function Signup() {
         <div className="w-full max-w-sm md:max-w-md lg:max-w-lg text-left">
           <div className="container px-4 mx-auto">
             <div className="max-w-lg mx-auto">
-              {/* <div className="text-center mb-6">
-                <h2 className="text-3xl md:text-5xl text-[#373A40]">
-                  Kayıt Ol
-                </h2>
-              </div> */}
               <form onSubmit={handleSubmit}>
                 <div className="mb-6">
                   <label className="block mb-2 text-[#373A40]">Ad Soyad</label>
