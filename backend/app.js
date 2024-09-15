@@ -5,6 +5,7 @@ import userRoute from "./routes/userRoute.js";
 import { checkUser } from "./middlewares/authMiddleWare.js";
 import cookieParser from "cookie-parser";
 import orderRoute from "./routes/orderRoute.js";
+import cors from "cors";
 // import methodOverride from 'method-override';
 
 dotenv.config();
@@ -16,6 +17,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 //static dosyası
+app.use(cors());
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

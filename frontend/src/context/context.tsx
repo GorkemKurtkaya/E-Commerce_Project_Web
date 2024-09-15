@@ -136,6 +136,8 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  
+
   const fetchSignupUser = async (
     name: string,
     email: string,
