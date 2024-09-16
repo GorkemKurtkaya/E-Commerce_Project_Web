@@ -44,45 +44,88 @@ const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        // Kullanıcıyı bul
         const user = await User.findOne({ email });
 
-        let same = false;
-        if (user) {
-            same = await bcrypt.compare(password, user.password);
-
-        } else {
+        // Şifre karşılaştırması için kontrol
+        if (!user) {
             return res.status(401).json({
-                succeded: false,
-                message: "Invalid credentials"
+                succeeded: false,
+                message: "Invalid email or password"
             });
         }
-        if (same) {
-            const token = createToken(user._id);
-            res.cookie("jwt", token, {
-                httpOnly: true,
-                secure: true,
-                maxAge: 24 * 60 * 60 * 1000
-            });
 
-            res.status(200).json({
-                succeded: true,
-                user: user._id,
-                token
-                
-            });
+        const same = await bcrypt.compare(password, user.password);
 
-        } else {
-            res.status(400).send("Invalid credentials");
+        // Şifre doğru mu?
+        if (!same) {
+            return res.status(401).json({
+                succeeded: false,
+                message: "Invalid email or password"
+            });
         }
+
+        // Şifre doğruysa token oluştur
+        const token = createToken(user._id); // createToken fonksiyonu JWT oluşturuyor olmalı.
+        res.cookie("jwt", token, {
+            httpOnly: true,  // XSS saldırılarına karşı koruma sağlar
+            secure: process.env.NODE_ENV === "production",  // Eğer üretim ortamındaysa secure olmalı
+            maxAge: 24 * 60 * 60 * 1000  // 1 gün
+        });
+
+        // Başarıyla giriş yaptı
+        res.status(200).json({
+            succeeded: true,
+            user: user._id,
+            token
+        });
+
+    } catch (error) {
+        // Sunucu hatası durumunda
+        res.status(500).json({
+            succeeded: false,
+            message: error.message
+        });
     }
+};
 
 
+const changePassword = async (req, res) => {
+    try {
+        const user = await User.findById(res.locals.user._id);
 
-    catch (error) {
-        res.status
-            (500).send(error);
+        if (!user) {
+            return res.status(404).json({
+                succeeded: false,
+                message: "User not found"
+            });
+        }
+
+        const same = await bcrypt.compare(req.body.oldPassword, user.password);
+
+        if (!same) {
+            return res.status(401).json({
+                succeeded: false,
+                message: "Invalid password"
+            });
+        }
+
+        user.password = req.body.newPassword;
+        await user.save();
+
+        res.status(200).json({
+            succeeded: true,
+            message: "Password changed successfully"
+        });
+    } catch (error) {
+        res.status(500).json({
+            succeeded: false,
+            message: error.message
+        });
     }
 }
+
+
 
 const createToken = (userId) => {
     return jwt.sign({
@@ -143,4 +186,4 @@ const getAUser=async(req,res)=>{
 
 
 
-export { registerUser, loginUser, createToken, logoutUser, getAllUsers, getAUser };
+export { registerUser, loginUser, createToken, logoutUser, getAllUsers, getAUser,changePassword };
