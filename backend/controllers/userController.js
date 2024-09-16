@@ -67,6 +67,7 @@ const loginUser = async (req, res) => {
             res.status(200).json({
                 succeded: true,
                 user: user._id,
+                token
                 
             });
 
@@ -90,6 +91,7 @@ const createToken = (userId) => {
         expiresIn: "1h"
     });
 }
+
 
 const logoutUser = (req, res) => {
     res.cookie("jwt", "", {
