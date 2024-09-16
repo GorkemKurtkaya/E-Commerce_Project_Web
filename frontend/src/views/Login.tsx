@@ -6,15 +6,11 @@ import { useNavigate } from "react-router-dom";
 
 import LeftSide from "../components/LeftSide";
 import { Link } from "react-router-dom";
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { FormEvent } from "react";
 import { ProductContext } from "../context/context";
 
-interface LoginProps {
-  onLogin: (userData: { email: string; password: string }) => void;
-}
-
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login = () => {
   const navigate = useNavigate();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [email, setEmail] = useState("");
@@ -58,7 +54,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         if (user) {
           // Giriş başarılı, kullanıcı bilgilerini burada kullanabilirsiniz
           setErrors(null); // Hata mesajlarını sıfırlıyoruz
-          onLogin(user);
           navigate("/");
         } else {
           // Giriş başarısız, hata mesajı göster

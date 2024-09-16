@@ -128,6 +128,9 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
       console.log("Giriş başarılı", response.data);
 
+      const token = response.data.token;
+      localStorage.setItem("user", token);
+
       // Eğer başarılıysa, kullanıcı bilgilerini döndür
       return response.data;
     } catch (error) {
@@ -151,6 +154,7 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         }
       );
       console.log("Kayıt Başarılı", response);
+
       return response.data;
     } catch (error) {
       console.error("Hata:", error);
