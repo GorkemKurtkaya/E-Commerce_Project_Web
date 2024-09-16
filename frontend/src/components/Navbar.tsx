@@ -1,35 +1,37 @@
 import "../index.css";
 import { Link } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-interface NavbarProps {
-  user: { name: string; email: string } | null;
-  onLogout: () => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
+const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isShoppingCartOpen, setIsShoppingCartOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const shoppingCartRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const itemsCount = 2; // Örnek ürün sayısı
+  const user = false;
 
   // Dropdown'u açma/kapama işlemi
   const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+    setIsDropdownOpen((prev) => !prev);
   };
 
   // Dropdown dışına tıklayınca menüyü kapatma
   useEffect(() => {
-    // const savedUser = localStorage.getItem("user");
-
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsDropdownOpen(false);
+      }
+      if (
+        shoppingCartRef.current &&
+        !shoppingCartRef.current.contains(event.target as Node)
+      ) {
+        setIsShoppingCartOpen(false); // Kullanıcı sepet menüsü dışına tıkladı, sepet menüsünü kapat
       }
     };
 
@@ -43,6 +45,9 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
   // Dropdown'da bir seçeneğe tıklayınca kapatma
   const handleDropdownOptionClick = () => {
     setIsDropdownOpen(false); // Dropdown'u kapat
+  };
+  const handleCartDropdownOptionClick = () => {
+    setIsShoppingCartOpen(false);
   };
 
   return (
@@ -77,12 +82,75 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
           )}
 
           <div className="flex-shrink-0 flex px-2 py-3 items-center space-x-2 sm:space-x-3 md:space-x-4">
-            <Link to="/shopping">
-              <i className="fa-solid fa-cart-shopping"></i>
-            </Link>
+            <div className="relative inline-block" ref={shoppingCartRef}>
+              <div className="relative">
+                <i
+                  className="fa-solid fa-cart-shopping cursor-pointer"
+                  onClick={() => setIsShoppingCartOpen((prev) => !prev)}
+                  aria-label="Sepet"
+                >
+                  {itemsCount > 0 && (
+                    <span className="absolute text-xs rounded-full -mt-2 -mr-2 px-1 font-bold top-0 right-0 bg-[#ff0000] text-white">
+                      {itemsCount}
+                    </span>
+                  )}
+                </i>
+              </div>
+
+              {isShoppingCartOpen && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
+                  <ul className="list-none p-0 m-0">
+                    <li className="p-2 flex bg-white hover:bg-gray-100 cursor-pointer border-b border-gray-100">
+                      <div className="p-2 w-12">
+                        <img
+                          src="https://dummyimage.com/50x50/bababa/0011ff&amp;text=50x50"
+                          alt="Product"
+                        />
+                      </div>
+                      <div className="flex-auto text-sm w-32">
+                        <div className="font-bold">Product 1</div>
+                        <div className="text-gray-400">Qt: 2</div>
+                      </div>
+                      <div>
+                        <i className="fa-solid fa-trash cursor-pointer text-[#ff0000]"></i>
+                      </div>
+                    </li>
+                    <li className="p-2 flex bg-white hover:bg-gray-100 cursor-pointer border-b border-gray-100">
+                      <div className="p-2 w-12">
+                        <img
+                          src="https://dummyimage.com/50x50/bababa/0011ff&amp;text=50x50"
+                          alt="Product"
+                        />
+                      </div>
+                      <div className="flex-auto text-sm w-32">
+                        <div className="font-bold">Product 1</div>
+                        <div className="text-gray-400">Qt: 2</div>
+                      </div>
+                      <div>
+                        <i className="fa-solid fa-trash cursor-pointer text-[#ff0000]"></i>
+                      </div>
+                    </li>
+                    {/* Diğer ürünler buraya eklenecek */}
+                  </ul>
+                  <div className="p-2">
+                    <Link
+                      to="/shopping"
+                      className="block text-center hover:underline"
+                      onClick={handleCartDropdownOptionClick}
+                    >
+                      Sepete Git
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
 
             <div className="relative" ref={dropdownRef}>
-              <button onClick={toggleDropdown} className="focus:outline-none">
+              <button
+                onClick={toggleDropdown}
+                className="focus:outline-none"
+                aria-label="Kullanıcı Menüsü"
+              >
                 <i className="fa-solid fa-user"></i>
               </button>
 
@@ -92,7 +160,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
                     {user ? (
                       <>
                         <li className="block px-4 py-2 text-gray-700">
-                          Merhaba, {user.name}
+                          Merhaba, {user}
                         </li>
                         <li>
                           <Link
@@ -104,10 +172,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
                           </Link>
                         </li>
                         <li>
-                          <button
-                            onClick={onLogout}
-                            className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-200"
-                          >
+                          <button className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-200">
                             Çıkış Yap
                           </button>
                         </li>

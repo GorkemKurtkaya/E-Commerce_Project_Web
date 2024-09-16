@@ -131,9 +131,9 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
           withCredentials: true, // Buraya taşındı
         }
       );
-  
-      console.log("Giriş başarılı");
-  
+
+      console.log("Giriş başarılı", response.data);
+
       // Eğer başarılıysa, kullanıcı bilgilerini döndür
       return response.data;
     } catch (error) {
@@ -141,7 +141,6 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       return null; // Hata durumunda null döndürüyoruz
     }
   };
-
 
   const fetchSignupUser = async (
     name: string,
@@ -158,6 +157,7 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         }
       );
       console.log("Kayıt Başarılı", response);
+
       return response.data;
     } catch (error) {
       console.error("Hata:", error);
