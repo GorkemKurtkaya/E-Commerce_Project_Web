@@ -2,6 +2,13 @@ import Order from "../models/ordermodel.js";
 import User from "../models/usermodel.js";
 
 const createProduct = async (req, res) => {
+    if (req.user.role !== "admin") {
+        return res.status(403).json({
+            succeeded: false,
+            message: "Access denied"
+        });
+    }
+
     try {
         const { name, category, price, imageUri } = req.body;
 
