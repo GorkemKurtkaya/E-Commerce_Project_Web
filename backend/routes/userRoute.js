@@ -5,6 +5,7 @@ import { purchaseProduct } from '../controllers/orderController.js';
 import { checkUser } from '../middlewares/authMiddleWare.js';
 
 
+
 const router = express.Router();
 
 router.post('/register', userController.registerUser);
@@ -16,6 +17,18 @@ router.get('/checkUser', checkUser, (req, res) => {
         res.status(200).json({ user: res.locals.user });
     } else {
         res.status(401).json({ message: 'Unauthorized' });
+    }
+});
+
+router.get("/cook", (req, res) => {
+    // Çerezi al
+    const cookie = req.cookies['jwt'];
+    
+    // Eğer çerez varsa, gönder
+    if (cookie) {
+        res.send({ cookie });
+    } else {
+        res.status(404).send("Cookie not found");
     }
 });
 
