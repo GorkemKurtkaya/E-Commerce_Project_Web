@@ -6,6 +6,7 @@ import { checkUser } from "./middlewares/authMiddleWare.js";
 import cookieParser from "cookie-parser";
 import orderRoute from "./routes/orderRoute.js";
 import cors from "cors";
+import pageRoute from './routes/pageRoute.js';
 // import methodOverride from 'method-override';
 
 dotenv.config();
@@ -17,11 +18,16 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 //static dosyası
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", // frontend URL'ini buraya koy
+  credentials: true, // cookie'lerin frontend ile paylaşılmasına izin ver
+}));
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+
 // app.use(fileUpload({
 //     useTempFiles:true
 // }));
@@ -29,9 +35,12 @@ app.use(cookieParser());
 //     methods: ['POST', 'GET']
 // }));
 
-// app.use('*', checkUser);
+//routes
+app.use('*', checkUser);
+app.use(pageRoute);
 app.use("/users", userRoute);
 app.use("/orders", orderRoute);
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

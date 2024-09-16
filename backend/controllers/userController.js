@@ -3,6 +3,9 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 
+
+
+
 const registerUser = async (req, res) => {
     try {
         const user = await User.create(req.body);
@@ -57,13 +60,14 @@ const loginUser = async (req, res) => {
             const token = createToken(user._id);
             res.cookie("jwt", token, {
                 httpOnly: true,
+                secure: true,
                 maxAge: 24 * 60 * 60 * 1000
             });
 
             res.status(200).json({
                 succeded: true,
                 user: user._id,
-                token
+                
             });
 
         } else {
@@ -108,18 +112,22 @@ const getAllUsers = async (req, res) => {
         });
     }
 }
-const getAUsers = async (req, res) => {
+
+const getAUser=async(req,res)=>{
     try {
-        const user = await User.findById({ _id: req.params.id });
-        const inFollowers = user.followers.some((follower) => {
-            return follower.equals(res.locals.user._id);
-        });
-        const photos = await Photo.find({ user: user._id });
-        res.status(200).render("user", {
-            user,
-            inFollowers,
-            photos,
-            link: "users"
+        const user = await User.findById(req.params.id);
+        
+        if (!user) {
+            return res.status(404).json({
+                succeded: false,
+                error: "User not found"
+            });
+        }
+
+        res.status(200).json({
+            name: user.username,
+            email:user.email,
+            id:user._id
         });
     }
     catch (error) {
@@ -133,4 +141,4 @@ const getAUsers = async (req, res) => {
 
 
 
-export { registerUser, loginUser, createToken, logoutUser, getAllUsers, getAUsers };
+export { registerUser, loginUser, createToken, logoutUser, getAllUsers, getAUser };
