@@ -121,19 +121,16 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     password: string
   ): Promise<{ email: string; password: string } | null> => {
     try {
-      const response = await axios.post(
-        "http://localhost:3000/users/login",
-        {
-          email: email,
-          password: password,
-        },
-        {
-          withCredentials: true, // Buraya taşındı
-        }
-      );
-  
-      console.log("Giriş başarılı");
-  
+      const response = await axios.post("http://localhost:3000/users/login", {
+        email: email,
+        password: password,
+      });
+
+      console.log("Giriş başarılı", response.data);
+
+      const token = response.data.token;
+      localStorage.setItem("user", token);
+
       // Eğer başarılıysa, kullanıcı bilgilerini döndür
       return response.data;
     } catch (error) {
@@ -141,7 +138,6 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       return null; // Hata durumunda null döndürüyoruz
     }
   };
-
 
   const fetchSignupUser = async (
     name: string,
@@ -158,6 +154,7 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         }
       );
       console.log("Kayıt Başarılı", response);
+
       return response.data;
     } catch (error) {
       console.error("Hata:", error);
