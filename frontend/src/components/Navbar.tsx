@@ -1,24 +1,35 @@
 import "../index.css";
-import { Link } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation, matchPath } from "react-router-dom";
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { Product } from "../types/Product";
+import { ProductContext } from "../context/context";
+import SearchItem from "./SearchItem";
+import ShoppingCart from "./ShoppingCart";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isShoppingCartOpen, setIsShoppingCartOpen] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const shoppingCartRef = useRef<HTMLDivElement>(null);
+
   const location = useLocation();
-  const itemsCount = 2; // Örnek ürün sayısı
-  const user = false;
 
-  // Dropdown'u açma/kapama işlemi
-  const toggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
-  };
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
 
-  // Dropdown dışına tıklayınca menüyü kapatma
+  const context = useContext(ProductContext);
+
+  if (!context) {
+    throw new Error("ProductContext must be used within a ProductProvider");
+  }
+
+  const { searchProducts } = context;
+
+  useEffect(() => {
+    const results = searchProducts(searchQuery);
+    setSearchResults(results);
+  }, [searchQuery, searchProducts]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -26,12 +37,6 @@ const Navbar = () => {
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsDropdownOpen(false);
-      }
-      if (
-        shoppingCartRef.current &&
-        !shoppingCartRef.current.contains(event.target as Node)
-      ) {
-        setIsShoppingCartOpen(false); // Kullanıcı sepet menüsü dışına tıkladı, sepet menüsünü kapat
       }
     };
 
@@ -42,13 +47,27 @@ const Navbar = () => {
     };
   }, []);
 
-  // Dropdown'da bir seçeneğe tıklayınca kapatma
+  useEffect(() => {
+    // Sayfa değiştiğinde arama query ve dropdown'ları temizle
+    setSearchQuery("");
+    setIsDropdownOpen(false);
+  }, [location.pathname]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   const handleDropdownOptionClick = () => {
-    setIsDropdownOpen(false); // Dropdown'u kapat
+    setIsDropdownOpen(false);
   };
-  const handleCartDropdownOptionClick = () => {
-    setIsShoppingCartOpen(false);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
   };
+
+  // Örnek ürün sayısı ve kullanıcı
+
+  const user = false;
 
   return (
     <div className="top-0 left-0 w-full z-50 bg-white border-b backdrop-blur-lg bg-opacity-80">
@@ -70,87 +89,35 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {location.pathname === "/" && (
-            <div className="flex flex-1 items-center justify-start mx-auto text-gray-600">
+          {(location.pathname === "/" ||
+            matchPath("/product/:id", location.pathname)) && (
+            <div className="relative flex flex-1 items-center justify-start mx-auto text-gray-600">
               <input
                 className="border border-gray-300 placeholder-current h-10 px-3 rounded-md text-md focus:outline-none dark:bg-gray-300 dark:border-gray-50 dark:text-gray-500 w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-1/2"
                 type="search"
                 name="search"
                 placeholder="Ara"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                autoComplete="off"
               />
+              {searchQuery && searchResults.length > 0 && (
+                <div className="absolute z-50 top-full mt-2 w-48 bg-white border rounded-md shadow-lg">
+                  <ul className="list-none p-0 m-0">
+                    {searchResults.slice(0, 5).map((product, index) => (
+                      <SearchItem key={index} product={product} />
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 
           <div className="flex-shrink-0 flex px-2 py-3 items-center space-x-2 sm:space-x-3 md:space-x-4">
-            <div className="relative inline-block" ref={shoppingCartRef}>
-              <div className="relative">
-                <i
-                  className="fa-solid fa-cart-shopping cursor-pointer"
-                  onClick={() => setIsShoppingCartOpen((prev) => !prev)}
-                  aria-label="Sepet"
-                >
-                  {itemsCount > 0 && (
-                    <span className="absolute text-xs rounded-full -mt-2 -mr-2 px-1 font-bold top-0 right-0 bg-[#ff0000] text-white">
-                      {itemsCount}
-                    </span>
-                  )}
-                </i>
-              </div>
-
-              {isShoppingCartOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
-                  <ul className="list-none p-0 m-0">
-                    <li className="p-2 flex bg-white hover:bg-gray-100 cursor-pointer border-b border-gray-100">
-                      <div className="p-2 w-12">
-                        <img
-                          src="https://dummyimage.com/50x50/bababa/0011ff&amp;text=50x50"
-                          alt="Product"
-                        />
-                      </div>
-                      <div className="flex-auto text-sm w-32">
-                        <div className="font-bold">Product 1</div>
-                        <div className="text-gray-400">Qt: 2</div>
-                      </div>
-                      <div>
-                        <i className="fa-solid fa-trash cursor-pointer text-[#ff0000]"></i>
-                      </div>
-                    </li>
-                    <li className="p-2 flex bg-white hover:bg-gray-100 cursor-pointer border-b border-gray-100">
-                      <div className="p-2 w-12">
-                        <img
-                          src="https://dummyimage.com/50x50/bababa/0011ff&amp;text=50x50"
-                          alt="Product"
-                        />
-                      </div>
-                      <div className="flex-auto text-sm w-32">
-                        <div className="font-bold">Product 1</div>
-                        <div className="text-gray-400">Qt: 2</div>
-                      </div>
-                      <div>
-                        <i className="fa-solid fa-trash cursor-pointer text-[#ff0000]"></i>
-                      </div>
-                    </li>
-                    {/* Diğer ürünler buraya eklenecek */}
-                  </ul>
-                  <div className="p-2">
-                    <Link
-                      to="/shopping"
-                      className="block text-center hover:underline"
-                      onClick={handleCartDropdownOptionClick}
-                    >
-                      Sepete Git
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
+            <ShoppingCart />
 
             <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={toggleDropdown}
-                className="focus:outline-none"
-                aria-label="Kullanıcı Menüsü"
-              >
+              <button onClick={toggleDropdown} className="focus:outline-none">
                 <i className="fa-solid fa-user"></i>
               </button>
 
