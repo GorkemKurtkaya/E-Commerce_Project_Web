@@ -1,6 +1,7 @@
 import User from "../models/usermodel.js";
 import jwt from "jsonwebtoken";
 
+
 const checkUser=async (req, res, next) => {
     const token = req.cookies.jwt;
     if(token){
@@ -20,8 +21,6 @@ const checkUser=async (req, res, next) => {
         next();
     }
 }
-
-
 
 
     // const token =req.headers['authorization']&& req.headers['authorization'].split(' ')[1];
@@ -49,7 +48,7 @@ const checkUser=async (req, res, next) => {
                 jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
                     if (err) {
                         console.log(err.message);
-                        return res.redirect("/login");
+                        return res.status(401).send(message);
                     } else {
                         // Kullanıcıyı veritabanından getir
                         const user = await User.findById(decodedToken.userId);
@@ -62,7 +61,7 @@ const checkUser=async (req, res, next) => {
                     }
                 });
             } else {
-                res.redirect("/login");
+                
             }
         } catch (error) {
             res.status(401).send("Access denied");
