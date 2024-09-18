@@ -9,6 +9,7 @@ import Conditions from "./views/Conditions";
 import ProductPage from "./views/ProductPage";
 import Shopping from "./views/Shopping";
 import Account from "./views/Account";
+import PurchasedProductsItem from "./views/PurchasedProductsItem";
 
 import "./App.css";
 import "./index.css";
@@ -26,6 +27,10 @@ function App() {
           <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/shopping" element={<Shopping />} />
           <Route path="/account" element={<Account />} />
+          <Route
+            path="/purchasedProductsItem/:id"
+            element={<PurchasedProductsItem />}
+          />
         </Routes>
       </div>
       <Footer />
