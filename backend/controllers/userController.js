@@ -145,10 +145,14 @@ const addAddress = async (req, res) => {
             });
         }
 
-        // Yeni adres oluştur
+        // Yeni adres oluştur ve user bilgilerini kaydet
         const newAddress = new Address({
             address,
-            user: req.user._id  // Kullanıcı ID'sini adres ile ilişkilendir
+            user: {
+                _id: req.user._id,   // Kullanıcı ID'si
+                name: req.user.name, // Kullanıcının ismi
+                email: req.user.email // Kullanıcının email'i
+            }
         });
 
         // Adresi veritabanına kaydet
@@ -156,12 +160,12 @@ const addAddress = async (req, res) => {
 
         // Kullanıcının adres listesine yeni adres ID'sini ekle
         const user = await User.findById(req.user._id);
-        user.address.push(createdAddress);
+        user.address.push(createdAddress._id);
         await user.save();
 
         res.status(201).json({
             succeeded: true,
-            address: createdAddress,
+            address: createdAddress,  // DB'ye kaydedilen adres
             message: "Address created and added to user successfully"
         });
     } catch (error) {
