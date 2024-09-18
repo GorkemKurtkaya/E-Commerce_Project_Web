@@ -172,6 +172,7 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     <ProductContext.Provider
       value={{
         products,
+
         fetchProducts,
         fetchUser,
         fetchSignupUser,

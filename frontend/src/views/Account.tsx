@@ -1,4 +1,8 @@
 import { useState } from "react";
+import Infos from "../components/accountComponents/Infos";
+import ChangePassword from "../components/accountComponents/ChangePassword";
+import Adresses from "../components/accountComponents/Adresses";
+import PurchasedProducts from "../components/accountComponents/PurchasedProducts";
 
 const Account = () => {
   const [selectedSection, setSelectedSection] = useState(1);
@@ -6,7 +10,7 @@ const Account = () => {
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* Sol Taraf */}
-      <div className="w-full md:w-1/4 bg-gray-100 p-4">
+      <div className="w-full md:w-1/5 bg-gray-100 p-4">
         <div className="flex flex-col items-center md:justify-center h-full space-y-4">
           {" "}
           {/* Flex-col ve aralarına boşluk ekledim */}
@@ -54,12 +58,28 @@ const Account = () => {
       </div>
 
       {/* Sağ Taraf */}
-      <div className="w-full md:w-3/4 bg-white p-4">
+      <div className="w-full md:w-4/5 bg-white p-4">
         {/* Seçilen bölümün içeriği */}
-        {selectedSection === 1 && <div>Bilgilerim İçeriği</div>}
-        {selectedSection === 2 && <div>Şifre Değiştirme İçeriği</div>}
-        {selectedSection === 3 && <div>Adreslerim İçeriği</div>}
-        {selectedSection === 4 && <div>Geçmiş Siparişlerim İçeriği</div>}
+        {selectedSection === 1 && (
+          <div>
+            <Infos />
+          </div>
+        )}
+        {selectedSection === 2 && (
+          <div>
+            <ChangePassword />
+          </div>
+        )}
+        {selectedSection === 3 && (
+          <div>
+            <Adresses />
+          </div>
+        )}
+        {selectedSection === 4 && (
+          <div>
+            <PurchasedProducts />
+          </div>
+        )}
       </div>
     </div>
   );
