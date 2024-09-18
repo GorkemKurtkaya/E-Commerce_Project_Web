@@ -1,6 +1,7 @@
 import User from "../models/usermodel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import Address from "../models/addressmodel.js";
 
 
 
@@ -68,7 +69,7 @@ const loginUser = async (req, res) => {
         // Şifre doğruysa token oluştur
         const token = createToken(user._id); // createToken fonksiyonu JWT oluşturuyor olmalı.
         res.cookie("jwt", token, {
-            httpOnly: true,  // XSS saldırılarına karşı koruma sağlar
+            httpOnly: true,  
             secure: process.env.NODE_ENV === "production",  // Eğer üretim ortamındaysa secure olmalı
             maxAge: 24 * 60 * 60 * 1000  // 1 gün
         });
@@ -125,7 +126,51 @@ const changePassword = async (req, res) => {
     }
 }
 
+const addAddress = async (req, res) => {
+    if (req.user.role !== "user") {
+        return res.status(403).json({
+            succeeded: false,
+            message: "Access denied"
+        });
+    }
 
+    try {
+        const { address } = req.body;
+
+        // Zorunlu alanların kontrolü
+        if (!address) {
+            return res.status(400).json({
+                succeeded: false,
+                message: "All fields are required"
+            });
+        }
+
+        // Yeni adres oluştur
+        const newAddress = new Address({
+            address,
+            user: req.user._id  // Kullanıcı ID'sini adres ile ilişkilendir
+        });
+
+        // Adresi veritabanına kaydet
+        const createdAddress = await newAddress.save();
+
+        // Kullanıcının adres listesine yeni adres ID'sini ekle
+        const user = await User.findById(req.user._id);
+        user.address.push(createdAddress);
+        await user.save();
+
+        res.status(201).json({
+            succeeded: true,
+            address: createdAddress,
+            message: "Address created and added to user successfully"
+        });
+    } catch (error) {
+        res.status(500).json({
+            succeeded: false,
+            message: error.message
+        });
+    }
+};
 
 const createToken = (userId) => {
     return jwt.sign({
@@ -140,7 +185,10 @@ const logoutUser = (req, res) => {
     res.cookie("jwt", "", {
         maxAge: 1
     });
-    res.redirect("/");
+    res.status(200).json({
+        succeeded: true,
+        message: "Logged out successfully"
+    });
 }
 
 const getAllUsers = async (req, res) => {
@@ -186,4 +234,4 @@ const getAUser=async(req,res)=>{
 
 
 
-export { registerUser, loginUser, createToken, logoutUser, getAllUsers, getAUser,changePassword };
+export { registerUser, loginUser, createToken, logoutUser, getAllUsers, getAUser,changePassword,addAddress };
