@@ -186,14 +186,21 @@ const createToken = (userId) => {
 
 
 const logoutUser = (req, res) => {
+    // JWT çerezini temizle
     res.cookie("jwt", "", {
-        maxAge: 1
+        maxAge: 0, // Çerezi hemen sil
+        httpOnly: true, // Çerezi yalnızca HTTP istekleri üzerinden erişilebilir kılar
+        path: '/', // Çerezin geçerli olduğu yol
+        sameSite: 'Lax' // Güvenlik için, cross-site isteklerde kullanılabilir
     });
+
+    // Başarılı yanıt gönder
     res.status(200).json({
         succeeded: true,
         message: "Logged out successfully"
     });
-}
+};
+
 
 const getAllUsers = async (req, res) => {
     try {

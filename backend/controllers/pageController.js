@@ -26,9 +26,20 @@ const getLoginPage = (req, res) => {
 }
 
 const getLogout = (req, res) => {
-    res.cookie("jwt", "", {maxAge:1});
-    res.redirect("/");
-}
+    // JWT çerezini temizle
+    res.cookie("jwt", "", {
+        maxAge: 0, // Çerezi hemen sil
+        httpOnly: true, // Çerezi yalnızca HTTP istekleri üzerinden erişilebilir kılar
+        path: '/', // Çerezin geçerli olduğu yol
+        sameSite: 'Lax' // Güvenlik için, cross-site isteklerde kullanılabilir
+    });
+
+    // Başarılı yanıt gönder
+    res.status(200).json({
+        succeeded: true,
+        message: "Logged out successfully"
+    });
+};
 
 
 export {getIndexPage,getRegisterPage,getLoginPage,getLogout};

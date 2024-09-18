@@ -65,6 +65,7 @@ const checkUser=async (req, res, next) => {
             }
         } catch (error) {
             res.status(401).send("Access denied");
+            
         }
     };
 
