@@ -39,7 +39,6 @@ router.post('/:userid/purchase/:productid', purchaseProduct);
 router.post("/changePassword", authMiddleWare.authenticateToken, userController.changePassword);
 router.post("/addAddress",authMiddleWare.authenticateToken,userController.addAddress);
 
-router.get('/logout', userController.logoutUser);
 // router.route('/dashboard').get(authMiddleWare.authenticateToken, userController.getDashboardPage);
 
 

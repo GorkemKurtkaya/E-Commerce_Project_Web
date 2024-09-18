@@ -1,7 +1,10 @@
 import Order from "../models/ordermodel.js";
 import User from "../models/usermodel.js";
+import { v2 as cloudinary } from 'cloudinary';
+import fs from "fs";
 
 const createProduct = async (req, res) => {
+    
     if (req.user.role !== "admin") {
         return res.status(403).json({
             succeeded: false,
@@ -9,33 +12,44 @@ const createProduct = async (req, res) => {
         });
     }
 
-    try {
-        const { name, category, price, imageUri } = req.body;
+    const result = await cloudinary.uploader.upload(req.files.imageUri.tempFilePath, {
+        use_filename: true,
+        folder: "Baskisanati"
+    });
+    
 
+    try {
         // Zorunlu alanların kontrolü
-        if (!name || !category || !price || !imageUri) {
+        if (!req.body.name || !req.body.category || !req.body.price || !req.files.imageUri) {
             return res.status(400).json({
                 succeeded: false,
                 message: "All fields are required"
             });
         }
 
-        // Yeni ürün oluştur
-        const newProduct = new Order({
-            name,
-            category,
-            price,
-            imageUri
+
+        await Order.create({
+            name: req.body.name,
+            category: req.body.category,
+            price: req.body.price,
+            imageUri: result.secure_url
         });
 
-        // Veritabanına kaydet
-        const createdProduct = await newProduct.save();
+        fs.unlinkSync(req.files.imageUri.tempFilePath);
 
         res.status(201).json({
             succeeded: true,
-            product: createdProduct,
+            Order: {
+                name: req.body.name,
+                category: req.body.category,
+                price: req.body.price,
+                imageUri: result.secure_url
+            },
             message: "Product created successfully"
         });
+
+
+
     } catch (error) {
         res.status(500).json({
             succeeded: false,
@@ -93,4 +107,4 @@ const purchaseProduct = async (req, res) => {
     }
 };
 
-export { createProduct,purchaseProduct };
+export { createProduct, purchaseProduct };

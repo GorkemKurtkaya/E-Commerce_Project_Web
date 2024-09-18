@@ -145,10 +145,14 @@ const addAddress = async (req, res) => {
             });
         }
 
-        // Yeni adres oluştur
+        // Yeni adres oluştur ve user bilgilerini kaydet
         const newAddress = new Address({
             address,
-            user: req.user._id  // Kullanıcı ID'sini adres ile ilişkilendir
+            user: {
+                _id: req.user._id,   // Kullanıcı ID'si
+                name: req.user.name, // Kullanıcının ismi
+                email: req.user.email // Kullanıcının email'i
+            }
         });
 
         // Adresi veritabanına kaydet
@@ -156,12 +160,12 @@ const addAddress = async (req, res) => {
 
         // Kullanıcının adres listesine yeni adres ID'sini ekle
         const user = await User.findById(req.user._id);
-        user.address.push(createdAddress);
+        user.address.push(createdAddress._id);
         await user.save();
 
         res.status(201).json({
             succeeded: true,
-            address: createdAddress,
+            address: createdAddress,  // DB'ye kaydedilen adres
             message: "Address created and added to user successfully"
         });
     } catch (error) {
@@ -182,14 +186,21 @@ const createToken = (userId) => {
 
 
 const logoutUser = (req, res) => {
+    // JWT çerezini temizle
     res.cookie("jwt", "", {
-        maxAge: 1
+        maxAge: 0, // Çerezi hemen sil
+        httpOnly: true, // Çerezi yalnızca HTTP istekleri üzerinden erişilebilir kılar
+        path: '/', // Çerezin geçerli olduğu yol
+        sameSite: 'Lax' // Güvenlik için, cross-site isteklerde kullanılabilir
     });
+
+    // Başarılı yanıt gönder
     res.status(200).json({
         succeeded: true,
         message: "Logged out successfully"
     });
-}
+};
+
 
 const getAllUsers = async (req, res) => {
     try {
