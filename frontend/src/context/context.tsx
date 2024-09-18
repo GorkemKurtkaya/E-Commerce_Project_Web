@@ -1,6 +1,7 @@
 import React, { createContext, useState, ReactNode } from "react";
 import { Product } from "../types/Product"; // Ürün tipini içeri aktarıyoruz
 import axios from "axios";
+import Cookies from "js-cookie";
 
 interface ProductContextType {
   products: Product[];
@@ -15,6 +16,7 @@ interface ProductContextType {
     email: string,
     password: string
   ) => Promise<{ name: string; email: string; password: string } | null>;
+  fetchToken: () => void;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -140,12 +142,29 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       );
 
       console.log("Giriş başarılı", response.data);
+      const token = fetchToken();
+      if (token) {
+        console.log("Token bulundu:", token);
+      } else {
+        console.log("Token bulunamadı.");
+      }
 
       // Eğer başarılıysa, kullanıcı bilgilerini döndür
       return response.data;
     } catch (error) {
       console.error("Giriş sırasında bir hata oluştu:", error);
       return null; // Hata durumunda null döndürüyoruz
+    }
+  };
+
+  const fetchToken = () => {
+    const token = Cookies.get("jwt");
+    if (token) {
+      console.log("Token başarıyla alındı:", token);
+      return token;
+    } else {
+      console.error("Token bulunamadı. Cookie ayarlarını kontrol edin.");
+      return null;
     }
   };
 
@@ -172,6 +191,7 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     <ProductContext.Provider
       value={{
         products,
+        fetchToken,
         fetchProducts,
         fetchUser,
         fetchSignupUser,
