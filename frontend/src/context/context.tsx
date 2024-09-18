@@ -4,6 +4,7 @@ import axios from "axios";
 
 interface ProductContextType {
   products: Product[];
+  searchProducts: (query: string) => Product[];
   fetchProducts: (category: string) => void;
   fetchUser: (
     email: string,
@@ -116,6 +117,12 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  const searchProducts = (query: string): Product[] => {
+    return products.filter((product) => {
+      return product.name.toLowerCase().includes(query.toLowerCase());
+    });
+  };
+
   const fetchUser = async (
     email: string,
     password: string
@@ -150,11 +157,7 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     try {
       const response = await axios.post(
         "http://localhost:3000/users/register",
-        {
-          name: name,
-          email: email,
-          password: password,
-        }
+        { name: name, email: email, password: password }
       );
       console.log("Kayıt Başarılı", response);
 
@@ -167,7 +170,13 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   return (
     <ProductContext.Provider
-      value={{ products, fetchProducts, fetchUser, fetchSignupUser }}
+      value={{
+        products,
+        fetchProducts,
+        fetchUser,
+        fetchSignupUser,
+        searchProducts,
+      }}
     >
       {children}
     </ProductContext.Provider>

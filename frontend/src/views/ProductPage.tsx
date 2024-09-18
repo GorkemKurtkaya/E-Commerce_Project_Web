@@ -22,7 +22,7 @@ function ProductPages() {
               <img
                 className="absolute inset-0 w-full bg-white h-full object-scale-down rounded-lg p-4"
                 src={product?.imageUrl}
-                alt={product.name}
+                alt={product?.name}
                 loading="lazy"
               />
             </div>
@@ -30,7 +30,7 @@ function ProductPages() {
           <div className="md:flex-1 px-4 flex flex-col justify-between ">
             <div className="mb-8 md:mb-0">
               <h2 className="text-2xl font-bold text-black mb-2">
-                {product.name}
+                {product?.name}
               </h2>
               <p className="text-black text-md text-justify mb-4">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed
@@ -41,7 +41,7 @@ function ProductPages() {
                 <div className="flex flex-grow justify-center">
                   <div className="text-center">
                     <span className="font-bold text-black">Price:</span>
-                    <span className="text-black block">{product.price}</span>
+                    <span className="text-black block">{product?.price}</span>
                   </div>
                 </div>
                 <div className="flex flex-grow justify-center">
