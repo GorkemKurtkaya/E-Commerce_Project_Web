@@ -33,13 +33,12 @@ router.get("/cook", (req, res) => {
 });
 
 router.post('/login', userController.loginUser);
-
 router.route('/:id').get(userController.getAUser);
 router.post('/:userid/purchase/:productid', purchaseProduct);
 router.post("/changePassword", authMiddleWare.authenticateToken, userController.changePassword);
 router.post("/addAddress",authMiddleWare.authenticateToken,userController.addAddress);
 
-// router.route('/dashboard').get(authMiddleWare.authenticateToken, userController.getDashboardPage);
+
 
 
 
