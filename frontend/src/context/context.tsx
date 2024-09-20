@@ -6,6 +6,7 @@ interface ProductContextType {
   products: Product[];
   searchProducts: (query: string) => Product[];
   fetchProducts: (category: string) => void;
+  AuthCheck: () => Promise<boolean>;
   fetchUser: (
     email: string,
     password: string
@@ -21,6 +22,7 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const fetchProducts = (category: string) => {
     const staticProducts: Product[] = [
@@ -149,6 +151,25 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  const AuthCheck = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/users/auth", {
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        setIsLoggedIn(true); // Kullanıcı giriş yapmış
+        console.log("Kullanıcı doğrulandı");
+        return true; // Başarılı giriş
+      }
+    } catch (error) {
+      console.error("Doğrulama hatası:", error);
+      setIsLoggedIn(false); // Giriş yapmamış
+      return false; // Başarısız giriş
+    }
+    return false; // Diğer durumlar
+  };
+
   const fetchSignupUser = async (
     name: string,
     email: string,
@@ -172,6 +193,7 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     <ProductContext.Provider
       value={{
         products,
+        AuthCheck,
         fetchProducts,
         fetchUser,
         fetchSignupUser,

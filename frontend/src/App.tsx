@@ -9,11 +9,30 @@ import Conditions from "./views/Conditions";
 import ProductPage from "./views/ProductPage";
 import Shopping from "./views/Shopping";
 import Account from "./views/Account";
+import PurchasedProductsItem from "./views/PurchasedProductsItem";
+import { ProductContext } from "./context/context";
+import { useContext, useEffect, useState } from "react";
 
 import "./App.css";
 import "./index.css";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const context = useContext(ProductContext);
+
+  const AuthCheck = context?.AuthCheck;
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (AuthCheck) {
+        const asd = await AuthCheck(); // AuthCheck'in sonucunu bekle
+        setIsLoggedIn(asd); // Sonucu setState ile ayarla
+      }
+    };
+
+    checkAuth(); // Fonksiyonu çağır
+  }, [AuthCheck]);
+
   return (
     <div className="App flex flex-col h-screen">
       <Navbar />
@@ -25,7 +44,17 @@ function App() {
           <Route path="/conditions" element={<Conditions />} />
           <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/shopping" element={<Shopping />} />
-          <Route path="/account" element={<Account />} />
+          {isLoggedIn ? (
+            <>
+              <Route path="/account" element={<Account />} />
+              <Route
+                path="/purchasedProductsItem/:id"
+                element={<PurchasedProductsItem />}
+              />
+            </>
+          ) : (
+            <></>
+          )}
         </Routes>
       </div>
       <Footer />
