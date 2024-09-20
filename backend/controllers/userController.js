@@ -7,6 +7,7 @@ import Address from "../models/addressmodel.js";
 
 
 
+
 const registerUser = async (req, res) => {
     try {
         const user = await User.create(req.body);
@@ -78,7 +79,7 @@ const loginUser = async (req, res) => {
         res.status(200).json({
             succeeded: true,
             user: user._id,
-            token
+            message: "Login successful"
         });
 
     } catch (error) {
