@@ -22,24 +22,6 @@ const checkUser=async (req, res, next) => {
     }
 }
 
-
-    // const token =req.headers['authorization']&& req.headers['authorization'].split(' ')[1];
-
-    // if(!token){
-    //     return res.json({
-    //         success:false,
-    //         message:"Access denied",
-            
-    //     })
-
-    // }
-
-    // req.user=await User.findById(
-    //     jwt.verify(token, process.env.JWT_SECRET).userId
-    // )
-
-    // next();
-
     const authenticateToken = async (req, res, next) => {
         try {
             const token = req.cookies.jwt;
@@ -48,7 +30,7 @@ const checkUser=async (req, res, next) => {
                 jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
                     if (err) {
                         console.log(err.message);
-                        return res.status(401).send(message);
+                        return res.status(401).send("Access denied");
                     } else {
                         // Kullanıcıyı veritabanından getir
                         const user = await User.findById(decodedToken.userId);

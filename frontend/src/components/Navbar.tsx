@@ -82,32 +82,22 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogOut = async () => {
-    // try {
-    //   // JWT token'ını içeren bir istek gönder
-    //   await axios.get("http://localhost:3000/logout", {
-    //     withCredentials: true, // JWT'nin cookies'ten gönderilmesini sağlamak için
-    //   });
+    try {
+      // JWT token'ını içeren bir istek gönder
+      await axios.get("http://localhost:3000/logout", {
+        withCredentials: true, // JWT'nin cookies'ten gönderilmesini sağlamak için
+      });
 
-    //   // Kullanıcı bilgilerini ve token'ı kaldır
-    //   setIsLoggedIn(false); // Kullanıcı çıkış yaptı olarak ayarla
+      // Kullanıcı bilgilerini ve token'ı kaldır
+      setIsLoggedIn(false); // Kullanıcı çıkış yaptı olarak ayarla
 
-    //   // Login sayfasına yönlendir
-    //   navigate("/login  ");
-    //   window.location.reload(); // Sayfayı yenile
-    // } catch (error) {
-    //   console.error("Çıkış yaparken hata oluştu:", error);
-    // }
-    // Cookie'deki JWT token'ını sil
-    document.cookie =
-      "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=example.com; secure; SameSite=None;";
+      // Login sayfasına yönlendir
+      navigate("/login  ");
+      window.location.reload(); // Sayfayı yenile
+    } catch (error) {
+      console.error("Çıkış yaparken hata oluştu:", error);
+    }
 
-    // Kullanıcı bilgilerini ve token'ı kaldır
-    localStorage.removeItem("user"); // Kullanıcı bilgilerini kaldır
-    setIsLoggedIn(false); // Kullanıcı çıkış yaptı olarak ayarla
-
-    // Login sayfasına yönlendir
-    navigate("/login");
-    window.location.reload(); // Sayfayı yenile
   };
 
   // Örnek ürün sayısı ve kullanıcı

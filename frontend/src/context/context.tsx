@@ -22,7 +22,7 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [, setIsLoggedIn] = useState(false);
 
   const fetchProducts = (category: string) => {
     const staticProducts: Product[] = [
@@ -160,7 +160,6 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       if (response.status === 200) {
         setIsLoggedIn(true); // Kullanıcı giriş yapmış
         console.log("Kullanıcı doğrulandı");
-        // Kullanıcı verilerini çekebilirsiniz
         return true; // Başarılı giriş
       }
     } catch (error) {
