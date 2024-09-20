@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 import LeftSide from "../components/LeftSide";
 import { Link } from "react-router-dom";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { FormEvent } from "react";
 import { ProductContext } from "../context/context";
 
@@ -23,6 +23,15 @@ const Login = () => {
 
   // fetchUser fonksiyonunu context'ten al
   const fetchUser = context?.fetchUser;
+
+  const AuthCheck = context?.AuthCheck;
+
+  useEffect(() => {
+    if (AuthCheck) {
+      const asd = AuthCheck();
+      console.log(asd);
+    } // Bileşen yüklendiğinde AuthCheck'i çağırıyoruz
+  }, [AuthCheck]);
 
   const togglePasswordVisibility = () => {
     setPasswordVisible((prevState) => !prevState);
@@ -55,6 +64,7 @@ const Login = () => {
           // Giriş başarılı, kullanıcı bilgilerini burada kullanabilirsiniz
           setErrors(null); // Hata mesajlarını sıfırlıyoruz
           navigate("/");
+          window.location.reload();
         } else {
           // Giriş başarısız, hata mesajı göster
           setErrors({ email: "", password: "Geçersiz e-posta veya şifre" });

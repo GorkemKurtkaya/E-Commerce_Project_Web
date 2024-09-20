@@ -1,14 +1,17 @@
 import "../index.css";
-import { Link, useLocation, matchPath } from "react-router-dom";
+import { Link, useLocation, matchPath, useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { Product } from "../types/Product";
 import { ProductContext } from "../context/context";
 import SearchItem from "./SearchItem";
 import ShoppingCart from "./ShoppingCart";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import axios from "axios";
 
 const Navbar: React.FC = () => {
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -24,6 +27,19 @@ const Navbar: React.FC = () => {
   }
 
   const { searchProducts } = context;
+
+  const AuthCheck = context?.AuthCheck;
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (AuthCheck) {
+        const asd = await AuthCheck(); // AuthCheck'in sonucunu bekle
+        setIsLoggedIn(asd); // Sonucu setState ile ayarla
+      }
+    };
+
+    checkAuth(); // Fonksiyonu çağır
+  }, [AuthCheck]);
 
   useEffect(() => {
     const results = searchProducts(searchQuery);
@@ -63,6 +79,35 @@ const Navbar: React.FC = () => {
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleLogOut = async () => {
+    // try {
+    //   // JWT token'ını içeren bir istek gönder
+    //   await axios.get("http://localhost:3000/logout", {
+    //     withCredentials: true, // JWT'nin cookies'ten gönderilmesini sağlamak için
+    //   });
+
+    //   // Kullanıcı bilgilerini ve token'ı kaldır
+    //   setIsLoggedIn(false); // Kullanıcı çıkış yaptı olarak ayarla
+
+    //   // Login sayfasına yönlendir
+    //   navigate("/login  ");
+    //   window.location.reload(); // Sayfayı yenile
+    // } catch (error) {
+    //   console.error("Çıkış yaparken hata oluştu:", error);
+    // }
+    // Cookie'deki JWT token'ını sil
+    document.cookie =
+      "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=example.com; secure; SameSite=None;";
+
+    // Kullanıcı bilgilerini ve token'ı kaldır
+    localStorage.removeItem("user"); // Kullanıcı bilgilerini kaldır
+    setIsLoggedIn(false); // Kullanıcı çıkış yaptı olarak ayarla
+
+    // Login sayfasına yönlendir
+    navigate("/login");
+    window.location.reload(); // Sayfayı yenile
   };
 
   // Örnek ürün sayısı ve kullanıcı
@@ -124,7 +169,7 @@ const Navbar: React.FC = () => {
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
                   <ul className="py-1">
-                    {user ? (
+                    {isLoggedIn ? (
                       <>
                         <li className="block px-4 py-2 text-gray-700">
                           Merhaba, {user}
@@ -139,7 +184,10 @@ const Navbar: React.FC = () => {
                           </Link>
                         </li>
                         <li>
-                          <button className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-200">
+                          <button
+                            onClick={handleLogOut}
+                            className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-200"
+                          >
                             Çıkış Yap
                           </button>
                         </li>
