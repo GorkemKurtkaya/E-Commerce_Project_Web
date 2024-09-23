@@ -52,11 +52,11 @@ const loginUser = async (req, res) => {
         }
 
         // Şifre doğruysa token oluştur
-        const token = createToken(user._id); 
+        const token = createToken(user._id);
         res.cookie("jwt", token, {
-            httpOnly: true,  
-            secure: process.env.NODE_ENV === "production", 
-            maxAge: 24 * 60 * 60 * 1000  
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 24 * 60 * 60 * 1000
         });
 
         // Başarıyla giriş yaptı
@@ -112,6 +112,34 @@ const changePassword = async (req, res) => {
     }
 }
 
+const changeName = async (req, res) => {
+    try {
+        const user = await User.findById(res.locals.user._id);
+
+        if (!user) {
+            return res.status(404).json({
+                succeeded: false,
+                message: "User not found"
+            });
+        }
+
+        user.name = req.body.name;
+        await user.save();
+
+        res.status(200).json({
+            succeeded: true,
+            message: "Name changed successfully"
+        });
+
+
+    } catch (error) {
+        res.status(500).json({
+            succeeded: false,
+            message: error.message
+        });
+    }
+}
+
 const addAddress = async (req, res) => {
     if (req.user.role !== "user") {
         return res.status(403).json({
@@ -120,11 +148,11 @@ const addAddress = async (req, res) => {
         });
     }
 
-    
+
     try {
         const { address } = req.body;
 
-        
+
 
         if (!address) {
             return res.status(400).json({
@@ -167,15 +195,15 @@ const getAddresses = async (req, res) => {
     try {
         // Kullanıcı bilgileri `req.user`'da olmalı
         const user = await User.findById(req.user._id).populate('address');
-        
 
-        
-       if(!user){
-              return res.status(404).json({
-                succeeded:false,
-                message:"User not found"
-              });
-         }
+
+
+        if (!user) {
+            return res.status(404).json({
+                succeeded: false,
+                message: "User not found"
+            });
+        }
 
         // Adresleri başarılı şekilde döndür
         res.status(200).json({
@@ -273,10 +301,10 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-const getAUser=async(req,res)=>{
+const getAUser = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
-        
+
         if (!user) {
             return res.status(404).json({
                 succeded: false,
@@ -286,8 +314,8 @@ const getAUser=async(req,res)=>{
 
         res.status(200).json({
             name: user.username,
-            email:user.email,
-            id:user._id
+            email: user.email,
+            id: user._id
         });
     }
     catch (error) {
@@ -303,4 +331,6 @@ const getAUser=async(req,res)=>{
 
 
 
-export { registerUser, loginUser, createToken, getAllUsers, getAUser,changePassword,addAddress,getAddresses,deleteAddress,updateAddress };
+export { registerUser, loginUser, createToken, getAllUsers, getAUser, changePassword, addAddress, getAddresses, deleteAddress, updateAddress,
+    changeName
+ };

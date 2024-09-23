@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import validator from "validator";
+import { time } from "console";
 
 const { Schema } = mongoose;
 
@@ -23,8 +24,11 @@ const userSchema = new Schema({
     },
     purchasedProducts: [
         {
-            type: Schema.Types.ObjectId,
-            ref: "Order"
+            productId: {
+                type: Schema.Types.ObjectId,
+                ref: "Order",
+                required: true
+            },
         }
     ],
     address: [
