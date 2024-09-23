@@ -29,7 +29,7 @@ const userSchema = new Schema({
     ],
     address: [
         {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: "Address"
     }
     ],
@@ -40,8 +40,15 @@ const userSchema = new Schema({
     }
 }, { timestamps: true });
 
+
 userSchema.pre("save", function (next) {
     const user = this;
+
+    // Eğer password değişmemişse, hashleme işlemini atla
+    if (!user.isModified('password')) {
+        return next();
+    }
+
     bcrypt.hash(user.password, 10, (error, hash) => {
         user.password = hash;
         next();

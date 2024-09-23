@@ -37,6 +37,9 @@ router.route('/:id').get(userController.getAUser);
 router.post('/:userid/purchase/:productid', purchaseProduct);
 router.post("/changePassword", authMiddleWare.authenticateToken, userController.changePassword);
 router.post("/addAddress",authMiddleWare.authenticateToken,userController.addAddress);
+router.get("/adresgetir/:id",authMiddleWare.authenticateToken,userController.getAddresses);
+router.delete("/adresSil/:id/",authMiddleWare.authenticateToken,userController.deleteAddress);
+router.put("/adresGuncelle/:id",authMiddleWare.authenticateToken,userController.updateAddress);
 
 
 
