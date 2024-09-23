@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import validator from "validator";
+import { time } from "console";
 
 const { Schema } = mongoose;
 
@@ -23,13 +24,16 @@ const userSchema = new Schema({
     },
     purchasedProducts: [
         {
-            type: Schema.Types.ObjectId,
-            ref: "Order"
+            productId: {
+                type: Schema.Types.ObjectId,
+                ref: "Order",
+                required: true
+            },
         }
     ],
     address: [
         {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: "Address"
     }
     ],
@@ -40,8 +44,15 @@ const userSchema = new Schema({
     }
 }, { timestamps: true });
 
+
 userSchema.pre("save", function (next) {
     const user = this;
+
+    // Eğer password değişmemişse, hashleme işlemini atla
+    if (!user.isModified('password')) {
+        return next();
+    }
+
     bcrypt.hash(user.password, 10, (error, hash) => {
         user.password = hash;
         next();
