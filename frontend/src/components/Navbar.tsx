@@ -1,7 +1,7 @@
 import "../index.css";
 import { Link, useLocation, matchPath, useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { Product } from "../types/Product";
+import { Product } from "../types/Types";
 import { ProductContext } from "../context/context";
 import SearchItem from "./SearchItem";
 import ShoppingCart from "./ShoppingCart";
@@ -97,7 +97,6 @@ const Navbar: React.FC = () => {
     } catch (error) {
       console.error("Çıkış yaparken hata oluştu:", error);
     }
-
   };
 
   // Örnek ürün sayısı ve kullanıcı

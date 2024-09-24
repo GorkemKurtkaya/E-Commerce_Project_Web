@@ -1,44 +1,49 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useContext, useEffect } from "react";
+import { ProductContext } from "../../context/context";
 
 const Infos = () => {
+  // Başlangıçta bilgileri span olarak göster
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name, setName] = useState("Ömer Fikri Gülcemal");
+  const [email, setEmail] = useState("omer.fikri23@gmail.com");
+  const [phone, setPhone] = useState("0500000000");
 
-  // Kullanıcı bilgilerini API'den çek
+  const context = useContext(ProductContext);
+
+  if (!context) {
+    throw new Error("ProductContext must be used within a ProductProvider");
+  }
+
+  const userData = context?.fetchUserInfos;
+
   useEffect(() => {
     const fetchUserData = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/users/checkUser", {
-          withCredentials: true, // Gerekirse cookie'leri göndermek için
-        });
-        const user = response.data.user;
+      const user = await userData();
+      if (user) {
         setName(user.name);
         setEmail(user.email);
-        setPhone(user.phone || ""); // Telefon numarası yoksa boş bırak
-      } catch (error) {
-        console.error("Kullanıcı bilgileri çekilirken hata oluştu:", error);
+        setPhone(user.phone || "");
       }
     };
 
     fetchUserData();
   }, []); // Boş bağımlılık dizisi, yalnızca bileşen ilk yüklendiğinde çalışır
 
+  // Edit butonuna tıklandığında edit moduna geç
   const handleEditClick = () => {
     setIsEditing(true);
   };
 
+  // Güncelle butonuna tıklandığında bilgileri güncelle ve çıkış yap
   const handleUpdateClick = () => {
     setIsEditing(false);
-    // Burada bilgileri güncelleyebilirsiniz (gerekirse bir API isteği atabilirsin)
+    // Burada bilgileri güncelleyebilirsiniz
   };
 
   return (
     <div>
       <h1 className="text-2xl font-semibold text-center">Bilgilerim</h1>
-      <div className="flex flex-col md:flex-row p-4">
+      <div className="flex flex-col md:flex-row  p-4">
         <div className="w-full md:w-1/3 p-2">
           <span className="block text-md font-medium">Ad Soyad</span>
           {isEditing ? (
@@ -69,7 +74,7 @@ const Infos = () => {
           <span className="block text-md font-medium">Telefon Numarası</span>
           {isEditing ? (
             <input
-              type="text"
+              type="number"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="block text-lg border border-gray-400 rounded-lg p-2 mt-2"

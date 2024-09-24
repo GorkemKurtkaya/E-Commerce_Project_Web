@@ -1,5 +1,5 @@
 import "../index.css";
-import { Product } from "../types/Product";
+import { Product } from "../types/Types";
 import { useNavigate } from "react-router-dom";
 
 interface ProductItemProps {
