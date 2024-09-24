@@ -9,7 +9,7 @@ const addressSchema = new Schema({
     },
     user: {
         _id: {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true
         },

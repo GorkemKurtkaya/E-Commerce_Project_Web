@@ -5,7 +5,7 @@ import * as authMiddleWare from '../middlewares/authMiddleWare.js';
 const router = express.Router();
 
 router.post('/products',authMiddleWare.authenticateToken, orderController.createProduct);
-// router.post('/:id/purchase/:productid', orderController.purchaseProduct);
+router.post('/purchaseProduct/:userid', orderController.purchaseProduct);
 
 
 
