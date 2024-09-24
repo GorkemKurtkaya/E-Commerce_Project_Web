@@ -1,5 +1,5 @@
 import React, { createContext, useState, ReactNode } from "react";
-import { Product } from "../types/Product"; // Ürün tipini içeri aktarıyoruz
+import { Product, User } from "../types/Types"; // Ürün tipini içeri aktarıyoruz
 import axios from "axios";
 
 interface ProductContextType {
@@ -16,13 +16,18 @@ interface ProductContextType {
     email: string,
     password: string
   ) => Promise<{ name: string; email: string; password: string } | null>;
+  fetchUserInfos: () => Promise<User | null>;
+  fetchChangePassword: (
+    oldPassword: string,
+    newPassword: string
+  ) => Promise<boolean>;
+  fetchUserLogOut: () => Promise<boolean>;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const fetchProducts = (category: string) => {
     const staticProducts: Product[] = [
@@ -125,6 +130,25 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     });
   };
 
+  const fetchSignupUser = async (
+    name: string,
+    email: string,
+    password: string
+  ): Promise<{ name: string; email: string; password: string } | null> => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/users/register",
+        { name: name, email: email, password: password }
+      );
+      console.log("Kayıt Başarılı", response);
+
+      return response.data;
+    } catch (error) {
+      console.error("Hata:", error);
+      return null;
+    }
+  };
+
   const fetchUser = async (
     email: string,
     password: string
@@ -158,35 +182,73 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       });
 
       if (response.status === 200) {
-        setIsLoggedIn(true); // Kullanıcı giriş yapmış
-        console.log("Kullanıcı doğrulandı");
+        //Kullanıcı doğrulandı
         // Kullanıcı verilerini çekebilirsiniz
         return true; // Başarılı giriş
       }
     } catch (error) {
       console.error("Doğrulama hatası:", error);
-      setIsLoggedIn(false); // Giriş yapmamış
       return false; // Başarısız giriş
     }
     return false; // Diğer durumlar
   };
 
-  const fetchSignupUser = async (
-    name: string,
-    email: string,
-    password: string
-  ): Promise<{ name: string; email: string; password: string } | null> => {
+  const fetchUserInfos = async (): Promise<User | null> => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/users/checkUser",
+        {
+          withCredentials: true,
+        }
+      );
+      const userInfos = response.data.user;
+      return userInfos; // Kullanıcı bilgilerini döndür
+    } catch (error) {
+      console.error("Kullanıcı bilgileri çekilirken hata oluştu:", error);
+      return null; // Hata durumunda null döndür
+    }
+  };
+
+  const fetchChangePassword = async (
+    oldPassword: string,
+    newPassword: string
+  ) => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/users/register",
-        { name: name, email: email, password: password }
+        "http://localhost:3000/users/changePassword",
+        {
+          oldPassword: oldPassword,
+          newPassword: newPassword,
+        },
+        { withCredentials: true }
       );
-      console.log("Kayıt Başarılı", response);
-
-      return response.data;
+      if (response.status === 200) {
+        console.log("Şifre başarıyla değiştirildi.");
+        return true; // Başarılı giriş
+      } else {
+        console.error("Şifre değiştirme başarısız oldu:", response.status);
+        return false; // Başarısız giriş
+      }
     } catch (error) {
-      console.error("Hata:", error);
-      return null;
+      console.error("Şİfre Değiştirilmedi", error);
+      return false; // Başarısız giriş
+    }
+  };
+
+  const fetchUserLogOut = async () => {
+    try {
+      // JWT token'ını içeren bir istek gönder
+      await axios.get("http://localhost:3000/logout", {
+        withCredentials: true, // JWT'nin cookies'ten gönderilmesini sağlamak için
+      });
+
+      // Kullanıcı bilgilerini ve token'ı kaldır
+      return false; // Kullanıcı çıkış yaptı olarak ayarla
+
+      // Login sayfasına yönlendir
+    } catch (error) {
+      console.error("Çıkış yaparken hata oluştu:", error);
+      return true;
     }
   };
 
@@ -199,6 +261,9 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         fetchUser,
         fetchSignupUser,
         searchProducts,
+        fetchUserInfos,
+        fetchChangePassword,
+        fetchUserLogOut,
       }}
     >
       {children}

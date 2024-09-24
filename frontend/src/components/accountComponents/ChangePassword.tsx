@@ -1,18 +1,38 @@
 import "../../index.css";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { ProductContext } from "../../context/context";
 
 function ChangePassword() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword1, setNewPassword1] = useState("");
   const [newPassword2, setNewPassword2] = useState("");
 
-  const handleClick = () => {
+  const context = useContext(ProductContext);
+
+  if (!context) {
+    throw new Error("ProductContext must be used within a ProductProvider");
+  }
+
+  const fetchChangePassword = context?.fetchChangePassword;
+
+  const handleClick = async () => {
     if (oldPassword !== "") {
       if (newPassword1 !== "" && newPassword2 !== "") {
         if (newPassword1 === newPassword2) {
-          console.log("Şifre Güncellendi");
-          setNewPassword1("");
-          setNewPassword2("");
+          console.log("geldi");
+          const changePassword = await fetchChangePassword(
+            oldPassword,
+            newPassword1
+          );
+
+          if (changePassword) {
+            console.log("Şifre Güncellendi");
+            setOldPassword("");
+            setNewPassword1("");
+            setNewPassword2("");
+          } else {
+            console.log("Şifre Değiştirirken Hata Oluştu");
+          }
         } else {
           console.log("Şifreler uyuşmuyor");
         }

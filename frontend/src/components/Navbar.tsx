@@ -1,24 +1,22 @@
 import "../index.css";
 import { Link, useLocation, matchPath, useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { Product } from "../types/Product";
+import { Product } from "../types/Types";
 import { ProductContext } from "../context/context";
 import SearchItem from "./SearchItem";
 import ShoppingCart from "./ShoppingCart";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import axios from "axios";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const location = useLocation();
-
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<Product[]>([]);
 
   const context = useContext(ProductContext);
 
@@ -28,13 +26,15 @@ const Navbar: React.FC = () => {
 
   const { searchProducts } = context;
 
+  const fetchUserLogOut = context?.fetchUserLogOut;
+
   const AuthCheck = context?.AuthCheck;
 
   useEffect(() => {
     const checkAuth = async () => {
       if (AuthCheck) {
-        const asd = await AuthCheck(); // AuthCheck'in sonucunu bekle
-        setIsLoggedIn(asd); // Sonucu setState ile ayarla
+        const check = await AuthCheck(); // AuthCheck'in sonucunu bekle
+        setIsLoggedIn(check); // Sonucu setState ile ayarla
       }
     };
 
@@ -82,37 +82,17 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogOut = async () => {
-    // try {
-    //   // JWT token'ını içeren bir istek gönder
-    //   await axios.get("http://localhost:3000/logout", {
-    //     withCredentials: true, // JWT'nin cookies'ten gönderilmesini sağlamak için
-    //   });
+    const isLoggedOut = await fetchUserLogOut(); // Çıkış fonksiyonunu çağır
+    console.log(isLoggedOut);
 
-    //   // Kullanıcı bilgilerini ve token'ı kaldır
-    //   setIsLoggedIn(false); // Kullanıcı çıkış yaptı olarak ayarla
-
-    //   // Login sayfasına yönlendir
-    //   navigate("/login  ");
-    //   window.location.reload(); // Sayfayı yenile
-    // } catch (error) {
-    //   console.error("Çıkış yaparken hata oluştu:", error);
-    // }
-    // Cookie'deki JWT token'ını sil
-    document.cookie =
-      "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=example.com; secure; SameSite=None;";
-
-    // Kullanıcı bilgilerini ve token'ı kaldır
-    localStorage.removeItem("user"); // Kullanıcı bilgilerini kaldır
-    setIsLoggedIn(false); // Kullanıcı çıkış yaptı olarak ayarla
-
-    // Login sayfasına yönlendir
-    navigate("/login");
-    window.location.reload(); // Sayfayı yenile
+    if (!isLoggedOut) {
+      // Eğer çıkış başarılıysa
+      navigate("/login"); // Login sayfasına yönlendir
+      window.location.reload(); // Sayfayı yenile
+    } else {
+      console.error("Çıkış işlemi başarısız oldu.");
+    }
   };
-
-  // Örnek ürün sayısı ve kullanıcı
-
-  const user = false;
 
   return (
     <div className="top-0 left-0 w-full z-50 bg-white border-b backdrop-blur-lg bg-opacity-80">
@@ -171,9 +151,6 @@ const Navbar: React.FC = () => {
                   <ul className="py-1">
                     {isLoggedIn ? (
                       <>
-                        <li className="block px-4 py-2 text-gray-700">
-                          Merhaba, {user}
-                        </li>
                         <li>
                           <Link
                             to="/account"

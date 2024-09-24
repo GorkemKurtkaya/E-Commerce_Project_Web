@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
+import { ProductContext } from "../../context/context";
 
 const Infos = () => {
   // Başlangıçta bilgileri span olarak göster
@@ -6,6 +7,27 @@ const Infos = () => {
   const [name, setName] = useState("Ömer Fikri Gülcemal");
   const [email, setEmail] = useState("omer.fikri23@gmail.com");
   const [phone, setPhone] = useState("0500000000");
+
+  const context = useContext(ProductContext);
+
+  if (!context) {
+    throw new Error("ProductContext must be used within a ProductProvider");
+  }
+
+  const userData = context?.fetchUserInfos;
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = await userData();
+      if (user) {
+        setName(user.name);
+        setEmail(user.email);
+        setPhone(user.phone || "");
+      }
+    };
+
+    fetchUserData();
+  }, []); // Boş bağımlılık dizisi, yalnızca bileşen ilk yüklendiğinde çalışır
 
   // Edit butonuna tıklandığında edit moduna geç
   const handleEditClick = () => {
