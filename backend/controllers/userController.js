@@ -7,6 +7,7 @@ import Address from "../models/addressmodel.js";
 
 
 
+
 const registerUser = async (req, res) => {
     try {
         const user = await User.create(req.body);
@@ -16,26 +17,10 @@ const registerUser = async (req, res) => {
         });
 
     } catch (error) {
-
-
-        let errors2 = {}
-
-        if (error.code === 11000) {
-            errors2.email = "Email is already registered";
-        }
-
-
-        if (error.name === "ValidationError") {
-            Object.keys(error.errors).forEach((key) => {
-                errors2[key] = error.errors[key].message;
-
-            });
-        }
-
-
         res.status(400).json({
             succeded: false,
-            errors: errors2
+            error: error.message
+
         });
 
     }
@@ -48,7 +33,7 @@ const loginUser = async (req, res) => {
         // Kullanıcıyı bul
         const user = await User.findOne({ email });
 
-        // Şifre karşılaştırması için kontrol
+        // Kullanıcı var mı?
         if (!user) {
             return res.status(401).json({
                 succeeded: false,
@@ -56,9 +41,9 @@ const loginUser = async (req, res) => {
             });
         }
 
+        // Şifre doğru mu?
         const same = await bcrypt.compare(password, user.password);
 
-        // Şifre doğru mu?
         if (!same) {
             return res.status(401).json({
                 succeeded: false,
@@ -67,28 +52,27 @@ const loginUser = async (req, res) => {
         }
 
         // Şifre doğruysa token oluştur
-        const token = createToken(user._id); // createToken fonksiyonu JWT oluşturuyor olmalı.
+        const token = createToken(user._id);
         res.cookie("jwt", token, {
-            httpOnly: true,  
-            secure: process.env.NODE_ENV === "production",  // Eğer üretim ortamındaysa secure olmalı
-            maxAge: 24 * 60 * 60 * 1000  // 1 gün
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 24 * 60 * 60 * 1000
         });
 
         // Başarıyla giriş yaptı
         res.status(200).json({
             succeeded: true,
             user: user._id,
-            token
+            message: "Login successful"
         });
 
     } catch (error) {
-        // Sunucu hatası durumunda
         res.status(500).json({
             succeeded: false,
             message: error.message
         });
     }
-};
+}
 
 
 const changePassword = async (req, res) => {
@@ -111,13 +95,43 @@ const changePassword = async (req, res) => {
             });
         }
 
-        user.password = req.body.newPassword;
+        // Yeni şifreyi hashle
+        const hashedNewPassword = await bcrypt.hash(req.body.newPassword, 10);
+        user.password = hashedNewPassword; // Hashlenmiş yeni şifreyi ata
         await user.save();
 
         res.status(200).json({
             succeeded: true,
             message: "Password changed successfully"
         });
+    } catch (error) {
+        res.status(500).json({
+            succeeded: false,
+            message: error.message
+        });
+    }
+}
+
+const changeName = async (req, res) => {
+    try {
+        const user = await User.findById(res.locals.user._id);
+
+        if (!user) {
+            return res.status(404).json({
+                succeeded: false,
+                message: "User not found"
+            });
+        }
+
+        user.name = req.body.name;
+        await user.save();
+
+        res.status(200).json({
+            succeeded: true,
+            message: "Name changed successfully"
+        });
+
+
     } catch (error) {
         res.status(500).json({
             succeeded: false,
@@ -134,10 +148,12 @@ const addAddress = async (req, res) => {
         });
     }
 
+
     try {
         const { address } = req.body;
 
-        // Zorunlu alanların kontrolü
+
+
         if (!address) {
             return res.status(400).json({
                 succeeded: false,
@@ -145,27 +161,25 @@ const addAddress = async (req, res) => {
             });
         }
 
-        // Yeni adres oluştur ve user bilgilerini kaydet
         const newAddress = new Address({
             address,
             user: {
-                _id: req.user._id,   // Kullanıcı ID'si
-                name: req.user.name, // Kullanıcının ismi
-                email: req.user.email // Kullanıcının email'i
+                _id: req.user._id,
+                name: req.user.name,
+                email: req.user.email
             }
         });
 
-        // Adresi veritabanına kaydet
         const createdAddress = await newAddress.save();
 
         // Kullanıcının adres listesine yeni adres ID'sini ekle
         const user = await User.findById(req.user._id);
-        user.address.push(createdAddress._id);
+        user.address.push(createdAddress._id); // ObjectId türü eklendiğinden emin ol
         await user.save();
 
         res.status(201).json({
             succeeded: true,
-            address: createdAddress,  // DB'ye kaydedilen adres
+            address: createdAddress,
             message: "Address created and added to user successfully"
         });
     } catch (error) {
@@ -176,6 +190,94 @@ const addAddress = async (req, res) => {
     }
 };
 
+
+const getAddresses = async (req, res) => {
+    try {
+        // Kullanıcı bilgileri `req.user`'da olmalı
+        const user = await User.findById(req.user._id).populate('address');
+
+
+
+        if (!user) {
+            return res.status(404).json({
+                succeeded: false,
+                message: "User not found"
+            });
+        }
+
+        // Adresleri başarılı şekilde döndür
+        res.status(200).json({
+            succeeded: true,
+            addresses: user.address,
+            message: "Addresses fetched successfully"
+        });
+    } catch (error) {
+        res.status(500).json({
+            succeeded: false,
+            message: error.message
+        });
+    }
+};
+
+const deleteAddress = async (req, res) => {
+    try {
+        const address = await Address.findById(req.params.id);
+
+        if (!address) {
+            return res.status(404).json({
+                succeeded: false,
+                message: "Address not found"
+            });
+        }
+
+        // Adresi sil
+        await Address.findByIdAndDelete(req.params.id);
+
+        // Kullanıcının adres listesinden adresi kaldır
+        const user = await User.findById(req.user._id); // Kullanıcıyı bul
+        user.address = user.address.filter(addr => addr.toString() !== address._id.toString()); // Adresi kaldır
+        await user.save(); // Kullanıcıyı güncelle
+
+        res.status(200).json({
+            succeeded: true,
+            message: "Address deleted successfully"
+        });
+    } catch (error) {
+        res.status(500).json({
+            succeeded: false,
+            message: error.message
+        });
+    }
+};
+
+const updateAddress = async (req, res) => {
+    try {
+        const address = await Address.findById(req.params.id);
+
+        if (!address) {
+            return res.status(404).json({
+                succeeded: false,
+                message: "Address not found"
+            });
+        }
+
+        address.address = req.body.address;
+        await address.save();
+
+        res.status(200).json({
+            succeeded: true,
+            address,
+            message: "Address updated successfully"
+        });
+    } catch (error) {
+        res.status(500).json({
+            succeeded: false,
+            message: error.message
+        });
+    }
+}
+
+
 const createToken = (userId) => {
     return jwt.sign({
         userId
@@ -183,24 +285,6 @@ const createToken = (userId) => {
         expiresIn: "1h"
     });
 }
-
-
-const logoutUser = (req, res) => {
-    // JWT çerezini temizle
-    res.cookie("jwt", "", {
-        maxAge: 0, // Çerezi hemen sil
-        httpOnly: true, // Çerezi yalnızca HTTP istekleri üzerinden erişilebilir kılar
-        path: '/', // Çerezin geçerli olduğu yol
-        sameSite: 'Lax' // Güvenlik için, cross-site isteklerde kullanılabilir
-    });
-
-    // Başarılı yanıt gönder
-    res.status(200).json({
-        succeeded: true,
-        message: "Logged out successfully"
-    });
-};
-
 
 const getAllUsers = async (req, res) => {
     try {
@@ -217,10 +301,10 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-const getAUser=async(req,res)=>{
+const getAUser = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
-        
+
         if (!user) {
             return res.status(404).json({
                 succeded: false,
@@ -230,8 +314,8 @@ const getAUser=async(req,res)=>{
 
         res.status(200).json({
             name: user.username,
-            email:user.email,
-            id:user._id
+            email: user.email,
+            id: user._id
         });
     }
     catch (error) {
@@ -245,4 +329,8 @@ const getAUser=async(req,res)=>{
 
 
 
-export { registerUser, loginUser, createToken, logoutUser, getAllUsers, getAUser,changePassword,addAddress };
+
+
+export { registerUser, loginUser, createToken, getAllUsers, getAUser, changePassword, addAddress, getAddresses, deleteAddress, updateAddress,
+    changeName
+ };
