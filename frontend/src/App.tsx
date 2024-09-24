@@ -19,18 +19,17 @@ import "./index.css";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const context = useContext(ProductContext);
-
   const AuthCheck = context?.AuthCheck;
 
   useEffect(() => {
     const checkAuth = async () => {
       if (AuthCheck) {
-        const asd = await AuthCheck(); // AuthCheck'in sonucunu bekle
-        setIsLoggedIn(asd); // Sonucu setState ile ayarla
+        const isAuthenticated = await AuthCheck();
+        setIsLoggedIn(isAuthenticated);
       }
     };
 
-    checkAuth(); // Fonksiyonu çağır
+    checkAuth();
   }, [AuthCheck]);
 
   return (
@@ -53,7 +52,12 @@ function App() {
               />
             </>
           ) : (
-            <></>
+            <Route
+              path="*"
+              element={
+                <div className="text-center text-2xl">Sayfa Yükleniyor</div>
+              }
+            />
           )}
         </Routes>
       </div>
