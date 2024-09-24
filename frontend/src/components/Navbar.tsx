@@ -82,20 +82,15 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogOut = async () => {
-    try {
-      // JWT token'ını içeren bir istek gönder
-      await axios.get("http://localhost:3000/logout", {
-        withCredentials: true, // JWT'nin cookies'ten gönderilmesini sağlamak için
-      });
+    const isLoggedOut = await fetchUserLogOut(); // Çıkış fonksiyonunu çağır
+    console.log(isLoggedOut);
 
-      // Kullanıcı bilgilerini ve token'ı kaldır
-      setIsLoggedIn(false); // Kullanıcı çıkış yaptı olarak ayarla
-
-      // Login sayfasına yönlendir
-      navigate("/login  ");
+    if (!isLoggedOut) {
+      // Eğer çıkış başarılıysa
+      navigate("/login"); // Login sayfasına yönlendir
       window.location.reload(); // Sayfayı yenile
-    } catch (error) {
-      console.error("Çıkış yaparken hata oluştu:", error);
+    } else {
+      console.error("Çıkış işlemi başarısız oldu.");
     }
   };
 
