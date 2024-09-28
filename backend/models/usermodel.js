@@ -6,11 +6,7 @@ import { time } from "console";
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
-    name: {
-        type: String,
-        required: [true, "Name is required"],
-        validate: [validator.isAlphanumeric, "Name can only contain letters and numbers"]
-    },
+    name: { type: String, required: true, unique: true },
     email: {
         type: String,
         required: [true, "Email is required"],

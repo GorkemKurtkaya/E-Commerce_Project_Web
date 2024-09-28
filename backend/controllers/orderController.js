@@ -3,6 +3,8 @@ import User from "../models/usermodel.js";
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
 import mongoose from "mongoose";
+import Product from "../models/productmodel.js";
+
 
 const createProduct = async (req, res) => {
     
@@ -21,7 +23,7 @@ const createProduct = async (req, res) => {
 
     try {
         // Zorunlu alanların kontrolü
-        if (!req.body.name || !req.body.category || !req.body.price || !req.files.imageUri) {
+        if (!req.body.title || !req.body.desc || !req.body.category || !req.body.price || !req.files.imageUri) {
             return res.status(400).json({
                 succeeded: false,
                 message: "All fields are required"
@@ -29,8 +31,9 @@ const createProduct = async (req, res) => {
         }
 
 
-        await Order.create({
-            name: req.body.name,
+        await Product.create({
+            title: req.body.title,
+            desc:req.body.desc,
             category: req.body.category,
             price: req.body.price,
             imageUri: result.secure_url
@@ -41,7 +44,8 @@ const createProduct = async (req, res) => {
         res.status(201).json({
             succeeded: true,
             Order: {
-                name: req.body.name,
+                title: req.body.title,
+                desc:req.body.desc,
                 category: req.body.category,
                 price: req.body.price,
                 imageUri: result.secure_url
@@ -58,6 +62,14 @@ const createProduct = async (req, res) => {
         });
     }
 };
+
+
+
+
+
+
+
+
 //halledicem
 const purchaseProduct = async (req, res) => {
     try {
