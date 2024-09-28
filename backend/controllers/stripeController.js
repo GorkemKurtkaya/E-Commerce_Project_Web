@@ -1,7 +1,7 @@
-const router = require("express").Router();
-const stripe = require("stripe")(process.env.STRIPE_KEY);
+import Stripe from "stripe"; // Stripe'ı import et
+const stripe = new Stripe(process.env.STRIPE_KEY); // Stripe nesnesini oluştur
 
-router.post("/payment", (req, res) => {
+const payment = (req, res) => {
   stripe.charges.create(
     {
       source: req.body.tokenId,
@@ -16,6 +16,6 @@ router.post("/payment", (req, res) => {
       }
     }
   );
-});
+};
 
-module.exports = router;
+export { payment }; // payment fonksiyonunu dışa aktar

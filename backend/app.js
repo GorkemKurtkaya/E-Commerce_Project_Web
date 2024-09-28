@@ -11,6 +11,7 @@ import fileUpload from 'express-fileupload';
 import { v2 as cloudinary } from 'cloudinary';
 import cartRoute from "./routes/cartRoute.js"
 import productRoute from "./routes/productRoute.js"
+import stripe from "./routes/stripeRoute.js"
 
 // import methodOverride from 'method-override';
 
@@ -49,7 +50,7 @@ app.use("/users", userRoute);
 app.use("/orders", orderRoute);
 app.use("/cart",cartRoute);
 app.use("/product",productRoute);
-app.use("/checkout", stripeRoute);
+app.use("/checkout", stripe);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
