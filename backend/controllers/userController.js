@@ -326,11 +326,43 @@ const getAUser = async (req, res) => {
     }
 }
 
+const getUserStats= async (req, res) => {
+    if (req.user.role !== "admin") {
+        return res.status(403).json({
+            succeeded: false,
+            message: "Access denied"
+        });
+    }
+
+    const date = new Date();
+    const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
+  
+    try {
+      const data = await User.aggregate([
+        { $match: { createdAt: { $gte: lastYear } } },
+        {
+          $project: {
+            month: { $month: "$createdAt" },
+          },
+        },
+        {
+          $group: {
+            _id: "$month",
+            total: { $sum: 1 },
+          },
+        },
+      ]);
+      res.status(200).json(data)
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  };
+
 
 
 
 
 
 export { registerUser, loginUser, createToken, getAllUsers, getAUser, changePassword, addAddress, getAddresses, deleteAddress, updateAddress,
-    changeName
+    changeName,getUserStats
  };
