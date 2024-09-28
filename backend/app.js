@@ -49,6 +49,7 @@ app.use("/users", userRoute);
 app.use("/orders", orderRoute);
 app.use("/cart",cartRoute);
 app.use("/product",productRoute);
+app.use("/checkout", stripeRoute);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
