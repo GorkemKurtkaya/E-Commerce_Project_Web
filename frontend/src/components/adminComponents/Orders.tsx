@@ -1,6 +1,6 @@
 import "../../index.css";
 
 function Orders() {
-  return <div>Siparişler</div>;
+  return <div>Siparişlerr</div>;
 }
 export default Orders;
