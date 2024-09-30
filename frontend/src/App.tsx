@@ -10,6 +10,7 @@ import ProductPage from "./views/ProductPage";
 import Shopping from "./views/Shopping";
 import Account from "./views/Account";
 import PurchasedProductsItem from "./views/PurchasedProductsItem";
+import Admin from "./views/Admin";
 import { ProductContext } from "./context/context";
 import { useContext, useEffect, useState } from "react";
 
@@ -18,8 +19,17 @@ import "./index.css";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState("");
+  const [isLoading, setIsLoading] = useState(true); // Yeni state
+
   const context = useContext(ProductContext);
+
+  if (!context) {
+    throw new Error("ProductContext must be used within a ProductProvider");
+  }
+
   const AuthCheck = context?.AuthCheck;
+  const userData = context?.fetchUserInfos;
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -29,8 +39,21 @@ function App() {
       }
     };
 
+    const fetchUserData = async () => {
+      const user = await userData();
+      if (user) {
+        setRole(user.role);
+      }
+      setIsLoading(false); // Yüklenme durumu sona erdi
+    };
+
     checkAuth();
-  }, [AuthCheck]);
+    fetchUserData();
+  }, []);
+
+  if (isLoading) {
+    return <div className="text-center text-2xl">Yükleniyor...</div>; // Yüklenme ekranı
+  }
 
   return (
     <div className="App flex flex-col h-screen">
@@ -45,11 +68,19 @@ function App() {
           <Route path="/shopping" element={<Shopping />} />
           {isLoggedIn ? (
             <>
-              <Route path="/account" element={<Account />} />
-              <Route
-                path="/purchasedProductsItem/:id"
-                element={<PurchasedProductsItem />}
-              />
+              {role === "user" ? (
+                <>
+                  <Route path="/account" element={<Account />} />
+                  <Route
+                    path="/purchasedProductsItem/:id"
+                    element={<PurchasedProductsItem />}
+                  />
+                </>
+              ) : role === "admin" ? (
+                <>
+                  <Route path="/admin" element={<Admin />} />
+                </>
+              ) : null}
             </>
           ) : (
             <Route

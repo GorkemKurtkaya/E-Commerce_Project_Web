@@ -3,8 +3,9 @@ export interface Product {
     id: number;
     name: string;
     category: string;
-    price: string;
+    price: number;
     imageUrl: string;
+    quantity:number
 }
 
 export interface User{
@@ -15,4 +16,10 @@ export interface User{
     phone: string;
     adresses:[];
     PurchasedProducts:[];
+    role:string
+}
+
+export interface Address{
+    _id:string
+    address:string
 }

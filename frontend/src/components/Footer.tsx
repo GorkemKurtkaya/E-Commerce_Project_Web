@@ -3,7 +3,7 @@ import "../styles/footer.css";
 
 function Footer() {
   return (
-    <footer className="bg-[#5B99C2] relative bottom-0 w-full footer">
+    <footer className="bg-[#51af89] relative bottom-0 w-full footer">
       <div className="mx-auto max-w-7xl py-0 px-4 sm:px-6 md:flex md:items-center md:justify-between lg:px-8 ">
         <nav
           className="-mx-5 -my-2 flex flex-wrap justify-center order-2"

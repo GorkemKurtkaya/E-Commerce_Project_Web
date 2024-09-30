@@ -1,9 +1,12 @@
 import "../index.css";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { Product } from "../types/Types"; // Arayüz dosyasının yolunu ayarlayın
 
 function ShoppingCart() {
   const [isShoppingCartOpen, setIsShoppingCartOpen] = useState(false);
+  const [itemsCount, setItemsCount] = useState(0);
+  const [cartItems, setCartItems] = useState<Product[]>([]); // Product arayüzünü kullanıyoruz
   const shoppingCartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -17,6 +20,18 @@ function ShoppingCart() {
     };
     document.addEventListener("mousedown", handleClickOutside);
 
+    const getProductsCount = () => {
+      const storedProducts = localStorage.getItem("shoppingCart");
+      if (storedProducts) {
+        const productList: Product[] = JSON.parse(storedProducts); // Product türünde parse ediliyor
+        setCartItems(productList); // Sepet ürünlerini state'e kaydet
+        return productList.length;
+      }
+      return 0;
+    };
+
+    setItemsCount(getProductsCount());
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -26,7 +41,13 @@ function ShoppingCart() {
     setIsShoppingCartOpen(false);
   };
 
-  const itemsCount = 2;
+  const handleRemoveItem = (index: number) => {
+    const updatedCartItems = cartItems.filter((_, i) => i !== index);
+    setCartItems(updatedCartItems);
+    localStorage.setItem("shoppingCart", JSON.stringify(updatedCartItems)); // Güncellenmiş ürün listesini kaydet
+    setItemsCount(updatedCartItems.length); // Ürün sayısını güncelle
+  };
+
   return (
     <div className="relative inline-block" ref={shoppingCartRef}>
       <div className="relative">
@@ -47,36 +68,39 @@ function ShoppingCart() {
         <div className="absolute right-0 top-full mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
           <div>
             <ul className="list-none p-0 m-0">
-              <li className="p-2 flex bg-white hover:bg-gray-100 cursor-pointer border-b border-gray-100">
-                <div className="p-2 w-12">
-                  <img
-                    src="https://dummyimage.com/50x50/bababa/0011ff&amp;text=50x50"
-                    alt="Product"
-                  />
-                </div>
-                <div className="flex-auto text-sm w-32">
-                  <div className="font-bold">Product 1</div>
-                  <div className="text-gray-400">Qt: 2</div>
-                </div>
-                <div>
-                  <i className="fa-solid fa-trash cursor-pointer text-[#ff0000]"></i>
-                </div>
-              </li>
-              <li className="p-2 flex bg-white hover:bg-gray-100 cursor-pointer border-b border-gray-100">
-                <div className="p-2 w-12">
-                  <img
-                    src="https://dummyimage.com/50x50/bababa/0011ff&amp;text=50x50"
-                    alt="Product"
-                  />
-                </div>
-                <div className="flex-auto text-sm w-32">
-                  <div className="font-bold">Product 1</div>
-                  <div className="text-gray-400">Qt: 2</div>
-                </div>
-                <div>
-                  <i className="fa-solid fa-trash cursor-pointer text-[#ff0000]"></i>
-                </div>
-              </li>
+              {cartItems.map((item, index) => (
+                <li
+                  key={item.id} // Ürün kimliğini kullanarak anahtar oluştur
+                  className="p-2 flex bg-white hover:bg-gray-100 cursor-pointer border-b border-gray-100"
+                >
+                  <Link
+                    to={`/product/${item.id}`} // Ürün sayfasına yönlendirme
+                    state={{ product: item }} // Ürün bilgilerini state ile gönder
+                    className="flex-auto flex items-center" // Flex ile içeriği ortala
+                    onClick={handleCartDropdownOptionClick} // Dropdown'u kapat
+                  >
+                    <div className="p-2 w-12">
+                      <img
+                        src={item.imageUrl} // Ürün resmi
+                        alt={item.name} // Ürün adı ile alt metin
+                        className="object-cover w-full h-12" // Resmi boyutlandırmak için stil ekleyebilirsiniz
+                      />
+                    </div>
+                    <div className="text-sm w-32">
+                      <div className="font-bold">{item.name}</div>
+                      <div className="text-gray-400">Qt: {item.quantity}</div>
+                      <div className="text-gray-400">Fiyat: {item.price}₺</div>
+                      {/* Ürün fiyatını göster */}
+                    </div>
+                  </Link>
+                  <div className="ml-2">
+                    <i
+                      className="fa-solid fa-trash cursor-pointer text-[#ff0000]"
+                      onClick={() => handleRemoveItem(index)} // Silme fonksiyonunu çağır
+                    ></i>
+                  </div>
+                </li>
+              ))}
             </ul>
             <div className="p-2">
               <Link
@@ -93,4 +117,5 @@ function ShoppingCart() {
     </div>
   );
 }
+
 export default ShoppingCart;

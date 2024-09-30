@@ -13,6 +13,7 @@ const Navbar: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [role, setRole] = useState("");
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -23,6 +24,8 @@ const Navbar: React.FC = () => {
   if (!context) {
     throw new Error("ProductContext must be used within a ProductProvider");
   }
+
+  const userData = context?.fetchUserInfos;
 
   const { searchProducts } = context;
 
@@ -38,6 +41,14 @@ const Navbar: React.FC = () => {
       }
     };
 
+    const fetchUserData = async () => {
+      const user = await userData();
+      if (user) {
+        setRole(user.role);
+      }
+    };
+
+    fetchUserData();
     checkAuth(); // Fonksiyonu çağır
   }, [AuthCheck]);
 
@@ -152,13 +163,27 @@ const Navbar: React.FC = () => {
                     {isLoggedIn ? (
                       <>
                         <li>
-                          <Link
-                            to="/account"
-                            onClick={handleDropdownOptionClick}
-                            className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
-                          >
-                            Hesabım
-                          </Link>
+                          {role === "user" ? (
+                            <>
+                              <Link
+                                to="/account"
+                                onClick={handleDropdownOptionClick}
+                                className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
+                              >
+                                Hesabım
+                              </Link>
+                            </>
+                          ) : role === "admin" ? (
+                            <>
+                              <Link
+                                to="/admin"
+                                onClick={handleDropdownOptionClick}
+                                className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
+                              >
+                                Hesabım
+                              </Link>
+                            </>
+                          ) : null}
                         </li>
                         <li>
                           <button

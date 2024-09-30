@@ -1,5 +1,5 @@
 import React, { createContext, useState, ReactNode } from "react";
-import { Product, User } from "../types/Types"; // Ürün tipini içeri aktarıyoruz
+import { Product, User, Address } from "../types/Types";
 import axios from "axios";
 
 interface ProductContextType {
@@ -21,6 +21,12 @@ interface ProductContextType {
     oldPassword: string,
     newPassword: string
   ) => Promise<boolean>;
+  fetchUserId: () => Promise<string>;
+  fetchChangeName: (name: string) => void;
+  fetchGetAdresses: () => Promise<Address | null>;
+  fetchAddAddress: (id: string) => void;
+  fetchUpdateAddress: (id: string, address: string) => void;
+  fetchDeleteAddress: (address: string) => void;
   fetchUserLogOut: () => Promise<boolean>;
 }
 
@@ -35,81 +41,91 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         id: 1,
         name: "Peace Lily",
         category: "Trash",
-        price: "$36.00",
+        price: 36.0,
         imageUrl:
           "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
+        quantity: 3,
       },
       {
         id: 2,
         name: "Snake Plant",
         category: "Trash",
-        price: "$30.00",
+        price: 30.0,
         imageUrl:
           "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
+        quantity: 3,
       },
       {
         id: 3,
         name: "Aloe Vera",
         category: "Trash",
-        price: "$25.00",
+        price: 25.0,
         imageUrl:
           "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
+        quantity: 3,
       },
       {
         id: 4,
         name: "Aloe Vera",
         category: "Indoor",
-        price: "$25.00",
+        price: 25.0,
         imageUrl:
           "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
+        quantity: 3,
       },
       {
         id: 5,
         name: "Aloe Vera",
         category: "Indoor",
-        price: "$25.00",
+        price: 25.0,
         imageUrl:
           "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
+        quantity: 3,
       },
       {
         id: 6,
         name: "Aloe Vera",
         category: "Indoor",
-        price: "$25.00",
+        price: 25.0,
         imageUrl:
           "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
+        quantity: 3,
       },
       {
         id: 7,
         name: "Aloe Vera",
         category: "Indoor",
-        price: "$25.00",
+        price: 25.0,
         imageUrl:
           "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
+        quantity: 3,
       },
       {
         id: 8,
         name: "Aloe Vera",
         category: "Indoor",
-        price: "$25.00",
+        price: 25.0,
         imageUrl:
           "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
+        quantity: 3,
       },
       {
         id: 9,
         name: "Aloe Vera",
         category: "Indoor",
-        price: "$25.00",
+        price: 25.0,
         imageUrl:
           "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
+        quantity: 3,
       },
       {
         id: 10,
         name: "Aloe Vera",
         category: "Indoor",
-        price: "$25.00",
+        price: 25.0,
         imageUrl:
           "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
+        quantity: 3,
       },
     ];
 
@@ -252,11 +268,117 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  const fetchUserId = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/users/checkUser",
+        {
+          withCredentials: true,
+        }
+      );
+      const userInfos = response.data.user;
+      return userInfos._id; // Kullanıcı bilgilerini döndür
+    } catch (error) {
+      console.error("Kullanıcı bilgileri çekilirken hata oluştu:", error);
+      return null; // Hata durumunda null döndür
+    }
+  };
+
+  const fetchChangeName = async (name: string) => {
+    try {
+      const response = axios.put(
+        "http://localhost:3000/users/changeName",
+        {
+          name: name,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("İsim Değiştirildi", response);
+    } catch (error) {
+      console.log("Bilgiler Değiştirilirken Hata Oluştu", error);
+    }
+  };
+
+  const fetchGetAdresses = async (): Promise<Address | null> => {
+    try {
+      const id = await fetchUserId();
+      if (id) {
+        const response = await axios.get(
+          `http://localhost:3000/users/adresgetir/${id}`,
+          {
+            withCredentials: true,
+          }
+        );
+        return response.data.addresses;
+      }
+      return null;
+    } catch (error) {
+      console.error("Kullanıcı Adresleri Çekilirken Hata Oluştu", error);
+      return null;
+    }
+  };
+
+  const fetchAddAddress = async (newAddress: string) => {
+    try {
+      const response = axios.post(
+        "http://localhost:3000/users/addAddress",
+        {
+          address: newAddress,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("Adres Eklendi", response);
+    } catch (error) {
+      console.log("Adres Eklerken Hata Oluştu", error);
+    }
+  };
+
+  const fetchDeleteAddress = async (id: string) => {
+    try {
+      const response = axios.delete(
+        `http://localhost:3000/users/adresSil/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("Adres Silindi", response);
+    } catch (error) {
+      console.log("Adres Silinirken Hata Oluuştu", error);
+    }
+  };
+
+  const fetchUpdateAddress = async (id: string, address: string) => {
+    try {
+      const response = axios.put(
+        `http://localhost:3000/users/adresGuncelle/${id}`,
+        {
+          address: address,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("Adres Güncellendi", response);
+    } catch (error) {
+      console.log("Adres Silerken Hata Oluştu", error);
+    }
+  };
+
   return (
     <ProductContext.Provider
       value={{
         products,
+        fetchUserId,
         AuthCheck,
+        fetchChangeName,
+        fetchGetAdresses,
+        fetchUpdateAddress,
+        fetchDeleteAddress,
+        fetchAddAddress,
         fetchProducts,
         fetchUser,
         fetchSignupUser,
