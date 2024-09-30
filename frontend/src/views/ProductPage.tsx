@@ -2,6 +2,7 @@ import "../index.css";
 import "../styles/productPages.css";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
+import { Product } from "../types/Types";
 
 function ProductPages() {
   const location = useLocation();
@@ -11,6 +12,31 @@ function ProductPages() {
 
   const shoppingClick = () => {
     console.log("ürün eklendi");
+
+    // Sepet verilerini al veya başlat
+    const existingCart: Product[] = JSON.parse(
+      localStorage.getItem("shoppingCart") || "[]"
+    );
+
+    // Ürünün mevcut olup olmadığını kontrol et
+    const existingProductIndex = existingCart.findIndex(
+      (item: Product) => item.id === product.id
+    );
+
+    if (existingProductIndex > -1) {
+      // Eğer ürün zaten sepette varsa, miktarı güncelle
+      existingCart[existingProductIndex].quantity! += counter; //  ile nullable kontrolü yapılır
+    } else {
+      // Ürün sepette yoksa yeni bir giriş oluştur
+      existingCart.push({
+        ...product,
+        quantity: counter, // Ürünün miktarını ekleyin
+      });
+    }
+
+    // Güncellenmiş sepeti localStorage'a kaydedin
+    localStorage.setItem("shoppingCart", JSON.stringify(existingCart));
+    window.location.reload();
   };
 
   return (

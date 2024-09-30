@@ -31,7 +31,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
         <div className="flex justify-between">
           <span className="block font-semibold text-xl">{product.name}</span>
           <span className="bg-white rounded-full text-orange-500 text-xs font-bold px-3 py-2 leading-none flex items-center">
-            {product.price}
+            ${product.price}
           </span>
         </div>
       </div>

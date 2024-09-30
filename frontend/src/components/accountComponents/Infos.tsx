@@ -4,9 +4,9 @@ import { ProductContext } from "../../context/context";
 const Infos = () => {
   // Başlangıçta bilgileri span olarak göster
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState("Ömer Fikri Gülcemal");
-  const [email, setEmail] = useState("omer.fikri23@gmail.com");
-  const [phone, setPhone] = useState("0500000000");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
 
   const context = useContext(ProductContext);
 
@@ -14,15 +14,16 @@ const Infos = () => {
     throw new Error("ProductContext must be used within a ProductProvider");
   }
 
-  const userData = context?.fetchUserInfos;
+  const userData = context.fetchUserInfos;
+  const changeName = context.fetchChangeName;
 
   useEffect(() => {
     const fetchUserData = async () => {
       const user = await userData();
       if (user) {
         setName(user.name);
+        setPhone(user.phone);
         setEmail(user.email);
-        setPhone(user.phone || "");
       }
     };
 
@@ -37,6 +38,7 @@ const Infos = () => {
   // Güncelle butonuna tıklandığında bilgileri güncelle ve çıkış yap
   const handleUpdateClick = () => {
     setIsEditing(false);
+    changeName(name);
     // Burada bilgileri güncelleyebilirsiniz
   };
 
@@ -59,16 +61,8 @@ const Infos = () => {
         </div>
         <div className="w-full md:w-1/3 p-2">
           <span className="block text-md font-medium">E-mail</span>
-          {isEditing ? (
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="block text-lg border border-gray-400 rounded-lg p-2 mt-2"
-            />
-          ) : (
-            <span className="block text-lg">{email}</span>
-          )}
+
+          <span className="block text-lg">{email}</span>
         </div>
         <div className="w-full md:w-1/3 p-2">
           <span className="block text-md font-medium">Telefon Numarası</span>
