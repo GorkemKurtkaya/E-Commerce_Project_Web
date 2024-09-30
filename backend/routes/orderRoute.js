@@ -4,8 +4,12 @@ import * as authMiddleWare from '../middlewares/authMiddleWare.js';
 
 const router = express.Router();
 
-router.post('/products',authMiddleWare.authenticateToken, orderController.createProduct);
-router.post('/purchaseProduct/:userid', orderController.purchaseProduct);
+router.post('/',authMiddleWare.authenticateToken, orderController.createOrder);
+router.put('/:id',authMiddleWare.authenticateToken, orderController.updateOrder);
+router.delete('/:id',authMiddleWare.authenticateToken, orderController.deleteOrder);
+router.get("/find/:userId",authMiddleWare.authenticateToken, orderController.getUserOrders);
+router.get("/",authMiddleWare.authenticateToken, orderController.getAllOrders);
+router.get("/income",authMiddleWare.authenticateToken, orderController.getOrderincome);
 
 
 

@@ -9,6 +9,10 @@ import cors from "cors";
 import pageRoute from './routes/pageRoute.js';
 import fileUpload from 'express-fileupload';
 import { v2 as cloudinary } from 'cloudinary';
+import cartRoute from "./routes/cartRoute.js"
+import productRoute from "./routes/productRoute.js"
+import stripe from "./routes/stripeRoute.js"
+
 // import methodOverride from 'method-override';
 
 dotenv.config();
@@ -44,7 +48,9 @@ app.use('*', checkUser);
 app.use(pageRoute);
 app.use("/users", userRoute);
 app.use("/orders", orderRoute);
-
+app.use("/cart",cartRoute);
+app.use("/product",productRoute);
+app.use("/checkout", stripe);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

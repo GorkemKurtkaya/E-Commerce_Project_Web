@@ -6,11 +6,7 @@ import { time } from "console";
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
-    name: {
-        type: String,
-        required: [true, "Name is required"],
-        validate: [validator.isAlphanumeric, "Name can only contain letters and numbers"]
-    },
+    name: { type: String, required: true, unique: true },
     email: {
         type: String,
         required: [true, "Email is required"],
@@ -22,15 +18,15 @@ const userSchema = new Schema({
         required: [true, "Password is required"],
         minLength: [3, "Password must be at least 3 characters long"]
     },
-    purchasedProducts: [
-        {
-            productId: {
-                type: Schema.Types.ObjectId,
-                ref: "Order",
-                required: true
-            },
-        }
-    ],
+    // purchasedProducts: [
+    //     {
+    //         productId: {
+    //             type: Schema.Types.ObjectId,
+    //             ref: "Order",
+    //             required: true
+    //         },
+    //     }
+    // ],
     address: [
         {
             type: mongoose.Schema.Types.ObjectId,
