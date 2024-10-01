@@ -40,6 +40,18 @@ const deleteOrder= async (req, res) => {
     }
   };
 
+
+  const getOrder = async (req, res) => {
+    try {
+      const order = await Order.findById(req.params.id); // findById ile belirli bir siparişi getir
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" }); // Sipariş bulunamazsa 404 döner
+      }
+      res.status(200).json(order); // Siparişi başarılı bir şekilde döner
+    } catch (err) {
+      res.status(500).json(err); // Hata durumunda 500 döner
+    }
+  };
 const getUserOrders= async (req, res) => {
     try {
       const orders = await Order.find({ userId: req.params.userId });
@@ -165,4 +177,4 @@ const getOrderincome= async (req, res) => {
 
 
 
-export { createOrder,updateOrder,deleteOrder,getUserOrders,getAllOrders,getOrderincome };
+export { createOrder,updateOrder,deleteOrder,getUserOrders,getAllOrders,getOrderincome,getOrder };

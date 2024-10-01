@@ -10,6 +10,7 @@ router.delete('/:id',authMiddleWare.authenticateToken, orderController.deleteOrd
 router.get("/find/:userId",authMiddleWare.authenticateToken, orderController.getUserOrders);
 router.get("/",authMiddleWare.authenticateToken, orderController.getAllOrders);
 router.get("/income",authMiddleWare.authenticateToken, orderController.getOrderincome);
+router.get("/findorder/:id",authMiddleWare.authenticateToken, orderController.getOrder);
 
 
 
