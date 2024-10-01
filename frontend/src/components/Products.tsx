@@ -19,7 +19,7 @@ const Products: React.FC<ProductProps> = ({ category }) => {
   useEffect(() => {
     const fetchProductsData = async () => {
       try {
-        fetchProducts(category);
+        await fetchProducts(category);
       } catch (error) {
         console.error("Failed to fetch products:", error);
       }
