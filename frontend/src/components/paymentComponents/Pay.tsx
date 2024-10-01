@@ -43,6 +43,7 @@ function Pay(){
             amount={2000}
             token={onToken}
             stripeKey={KEY}>
+
             
             </StripeCheckout>
         </div>
