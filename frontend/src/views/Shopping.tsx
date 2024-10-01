@@ -5,7 +5,7 @@ import { Product } from "../types/Types";
 
 function Shopping() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [quantities, setQuantities] = useState<{ [key: number]: number }>({});
+  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     const getProductsCount = () => {
@@ -15,9 +15,9 @@ function Shopping() {
         setProducts(productList);
 
         const initialQuantities = productList.reduce((acc, product) => {
-          acc[product.id] = 1; // Default quantity for each product
+          acc[product._id] = product.quantity; // Default quantity for each product
           return acc;
-        }, {} as { [key: number]: number });
+        }, {} as { [key: string]: number });
 
         setQuantities(initialQuantities);
       }
@@ -26,7 +26,7 @@ function Shopping() {
   }, []);
 
   // Update quantities and localStorage
-  const handleQuantityChange = (id: number, newQuantity: number) => {
+  const handleQuantityChange = (id: string, newQuantity: number) => {
     if (newQuantity < 1) return; // Quantity cannot be less than 1
     setQuantities((prev) => {
       const updatedQuantities = { ...prev, [id]: newQuantity };
@@ -35,7 +35,7 @@ function Shopping() {
       if (storedProducts) {
         const productList: Product[] = JSON.parse(storedProducts);
         const updatedProductList = productList.map((product) => {
-          return { ...product, quantity: updatedQuantities[product.id] || 1 };
+          return { ...product, quantity: updatedQuantities[product._id] || 1 };
         });
         localStorage.setItem(
           "shoppingCart",
@@ -46,8 +46,8 @@ function Shopping() {
     });
   };
 
-  const handleRemoveProduct = (id: number) => {
-    setProducts((prev) => prev.filter((product) => product.id !== id));
+  const handleRemoveProduct = (id: string) => {
+    setProducts((prev) => prev.filter((product) => product._id !== id));
     setQuantities((prev) => {
       const newQuantities = { ...prev };
       delete newQuantities[id]; // Remove product quantity
@@ -56,7 +56,7 @@ function Shopping() {
       if (storedProducts) {
         const productList: Product[] = JSON.parse(storedProducts);
         const updatedProductList = productList.filter(
-          (product) => product.id !== id
+          (product) => product._id !== id
         );
         localStorage.setItem(
           "shoppingCart",
@@ -85,15 +85,15 @@ function Shopping() {
                 </thead>
                 <tbody>
                   {products.map((product) => (
-                    <tr key={product.id} className="border-b border-gray-400">
+                    <tr key={product._id} className="border-b border-gray-400">
                       <td className="py-4">
                         <div className="flex flex-col md:flex-row items-center justify-between">
                           <img
                             className="h-16 w-16"
-                            src={product.imageUrl}
-                            alt={product.name}
+                            src={product.imageUri}
+                            alt={product.title}
                           />
-                          <span className="font-semibold">{product.name}</span>
+                          <span className="font-semibold">{product.title}</span>
                         </div>
                       </td>
                       <td className="py-4 p-4">
@@ -102,8 +102,8 @@ function Shopping() {
                             className="border border-gray-600 rounded-md py-2 px-4"
                             onClick={() =>
                               handleQuantityChange(
-                                product.id,
-                                quantities[product.id] - 1
+                                product._id,
+                                (quantities[product._id] || 0) - 1
                               )
                             }
                           >
@@ -111,12 +111,12 @@ function Shopping() {
                           </button>
 
                           <input
-                            value={quantities[product.id]}
+                            value={quantities[product._id] || 1}
                             type="number"
                             className="text-center w-12 border border-gray-500 rounded-md mx-2 py-2 appearance-none"
                             onChange={(e) =>
                               handleQuantityChange(
-                                product.id,
+                                product._id,
                                 Number(e.target.value)
                               )
                             }
@@ -126,8 +126,8 @@ function Shopping() {
                             className="border border-gray-600 rounded-md py-2 px-4"
                             onClick={() =>
                               handleQuantityChange(
-                                product.id,
-                                quantities[product.id] + 1
+                                product._id,
+                                (quantities[product._id] || 0) + 1
                               )
                             }
                           >
@@ -136,12 +136,15 @@ function Shopping() {
                         </div>
                       </td>
                       <td className="py-4 text-left">
-                        ${quantities[product.id] * product.price}
+                        $
+                        {(
+                          (quantities[product._id] || 0) * product.price
+                        ).toFixed(2)}
                       </td>
                       <td>
                         <i
                           className="fa-solid fa-trash cursor-pointer text-[#ff0000]"
-                          onClick={() => handleRemoveProduct(product.id)}
+                          onClick={() => handleRemoveProduct(product._id)}
                         ></i>
                       </td>
                     </tr>
@@ -160,7 +163,7 @@ function Shopping() {
                   {products
                     .reduce(
                       (total, product) =>
-                        total + quantities[product.id] * product.price,
+                        total + (quantities[product._id] || 0) * product.price,
                       0
                     )
                     .toFixed(2)}
@@ -173,7 +176,7 @@ function Shopping() {
                   {(
                     products.reduce(
                       (total, product) =>
-                        total + quantities[product.id] * product.price,
+                        total + (quantities[product._id] || 0) * product.price,
                       0
                     ) / 5
                   ).toFixed(2)}
@@ -191,12 +194,12 @@ function Shopping() {
                   {(
                     products.reduce(
                       (total, product) =>
-                        total + quantities[product.id] * product.price,
+                        total + (quantities[product._id] || 0) * product.price,
                       0
                     ) +
                     products.reduce(
                       (total, product) =>
-                        total + quantities[product.id] * product.price,
+                        total + (quantities[product._id] || 0) * product.price,
                       0
                     ) /
                       5

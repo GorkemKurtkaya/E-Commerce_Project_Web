@@ -70,24 +70,24 @@ function ShoppingCart() {
             <ul className="list-none p-0 m-0">
               {cartItems.map((item, index) => (
                 <li
-                  key={item.id} // Ürün kimliğini kullanarak anahtar oluştur
+                  key={item._id} // Ürün kimliğini kullanarak anahtar oluştur
                   className="p-2 flex bg-white hover:bg-gray-100 cursor-pointer border-b border-gray-100"
                 >
                   <Link
-                    to={`/product/${item.id}`} // Ürün sayfasına yönlendirme
+                    to={`/product/${item._id}`} // Ürün sayfasına yönlendirme
                     state={{ product: item }} // Ürün bilgilerini state ile gönder
                     className="flex-auto flex items-center" // Flex ile içeriği ortala
                     onClick={handleCartDropdownOptionClick} // Dropdown'u kapat
                   >
                     <div className="p-2 w-12">
                       <img
-                        src={item.imageUrl} // Ürün resmi
-                        alt={item.name} // Ürün adı ile alt metin
+                        src={item.imageUri} // Ürün resmi
+                        alt={item.title} // Ürün adı ile alt metin
                         className="object-cover w-full h-12" // Resmi boyutlandırmak için stil ekleyebilirsiniz
                       />
                     </div>
                     <div className="text-sm w-32">
-                      <div className="font-bold">{item.name}</div>
+                      <div className="font-bold">{item.title}</div>
                       <div className="text-gray-400">Qt: {item.quantity}</div>
                       <div className="text-gray-400">Fiyat: {item.price}₺</div>
                       {/* Ürün fiyatını göster */}

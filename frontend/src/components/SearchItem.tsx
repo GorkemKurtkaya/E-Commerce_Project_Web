@@ -10,21 +10,21 @@ const SearchItem: React.FC<SearchItemProps> = ({ product }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/product/${product.id}`, {
+    navigate(`/product/${product._id}`, {
       state: { product }, // Ürünü state ile gönder
     });
   };
 
   return (
     <div onClick={handleClick}>
-      <li key={product.id} className="p-2 hover:bg-gray-100 cursor-pointer">
+      <li key={product._id} className="p-2 hover:bg-gray-100 cursor-pointer">
         <div className="flex items-center">
           <img
             className="w-12 h-12 object-cover"
-            src={product.imageUrl}
-            alt={product.name}
+            src={product.imageUri}
+            alt={product.title}
           />
-          <span className="ml-2">{product.name}</span>
+          <span className="ml-2">{product.title}</span>
         </div>
       </li>
     </div>

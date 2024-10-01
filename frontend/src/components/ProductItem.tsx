@@ -10,7 +10,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/product/${product.id}`, {
+    navigate(`/product/${product._id}`, {
       state: { product }, // Ürünü state ile gönder
     });
   };
@@ -22,14 +22,14 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
       <div className="relative pt-10 px-10 flex items-center justify-center">
         <img
           className="relative w-40 object-cover"
-          src={product.imageUrl}
-          alt={product.name}
+          src={product.imageUri}
+          alt={product.title}
           loading="lazy"
         />
       </div>
       <div className="relative text-[#373A40] px-6 pb-6 mt-6">
         <div className="flex justify-between">
-          <span className="block font-semibold text-xl">{product.name}</span>
+          <span className="block font-semibold text-xl">{product.title}</span>
           <span className="bg-white rounded-full text-orange-500 text-xs font-bold px-3 py-2 leading-none flex items-center">
             ${product.price}
           </span>

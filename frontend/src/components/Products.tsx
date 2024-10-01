@@ -1,7 +1,8 @@
 import "../index.css";
 import ProductItem from "./ProductItem";
 import { ProductContext } from "../context/context";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { Product } from "../types/Types";
 
 interface ProductProps {
   category: string;
@@ -9,17 +10,24 @@ interface ProductProps {
 
 const Products: React.FC<ProductProps> = ({ category }) => {
   const context = useContext(ProductContext);
+  const [products, setProducts] = useState<Product[]>([]); // Initialize as empty array
 
   if (!context) {
     throw new Error("ProductContext must be used within a ProductProvider");
   }
 
-  const { products, fetchProducts } = context;
+  const getProducts = context.fetchProducts;
 
   useEffect(() => {
     const fetchProductsData = async () => {
       try {
-        await fetchProducts(category);
+        if (getProducts) {
+          const response = await getProducts(category);
+          if (response) {
+            // Check if response is not null
+            setProducts(response); // Set products only if response is valid
+          }
+        }
       } catch (error) {
         console.error("Failed to fetch products:", error);
       }
