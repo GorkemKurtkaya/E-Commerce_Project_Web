@@ -35,108 +35,30 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined);
 const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
 
-  const fetchProducts = (category: string) => {
-    const staticProducts: Product[] = [
-      {
-        id: 1,
-        name: "Peace Lily",
-        category: "Trash",
-        price: 36.0,
-        imageUrl:
-          "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
-        quantity: 3,
-      },
-      {
-        id: 2,
-        name: "Snake Plant",
-        category: "Trash",
-        price: 30.0,
-        imageUrl:
-          "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
-        quantity: 3,
-      },
-      {
-        id: 3,
-        name: "Aloe Vera",
-        category: "Trash",
-        price: 25.0,
-        imageUrl:
-          "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
-        quantity: 3,
-      },
-      {
-        id: 4,
-        name: "Aloe Vera",
-        category: "Indoor",
-        price: 25.0,
-        imageUrl:
-          "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
-        quantity: 3,
-      },
-      {
-        id: 5,
-        name: "Aloe Vera",
-        category: "Indoor",
-        price: 25.0,
-        imageUrl:
-          "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
-        quantity: 3,
-      },
-      {
-        id: 6,
-        name: "Aloe Vera",
-        category: "Indoor",
-        price: 25.0,
-        imageUrl:
-          "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
-        quantity: 3,
-      },
-      {
-        id: 7,
-        name: "Aloe Vera",
-        category: "Indoor",
-        price: 25.0,
-        imageUrl:
-          "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
-        quantity: 3,
-      },
-      {
-        id: 8,
-        name: "Aloe Vera",
-        category: "Indoor",
-        price: 25.0,
-        imageUrl:
-          "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
-        quantity: 3,
-      },
-      {
-        id: 9,
-        name: "Aloe Vera",
-        category: "Indoor",
-        price: 25.0,
-        imageUrl:
-          "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
-        quantity: 3,
-      },
-      {
-        id: 10,
-        name: "Aloe Vera",
-        category: "Indoor",
-        price: 25.0,
-        imageUrl:
-          "https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png",
-        quantity: 3,
-      },
-    ];
+  const fetchProducts = async (category: string) => {
+    try {
+      const response = await axios.get("http://localhost:3000/product/");
+      console.log(response.data);
+      const staticProducts = response.data;
+      console.log(staticProducts);
 
-    if (category !== "") {
-      const filteredProducts = staticProducts.filter(
-        (product) => product.category === category
-      );
-
-      setProducts(filteredProducts);
-    } else {
-      setProducts(staticProducts);
+      if (Array.isArray(staticProducts)) {
+        // staticProducts bir dizi mi kontrolü
+        if (category !== "") {
+          const filteredProducts = staticProducts.filter(
+            (product) => product.category === category
+          );
+          setProducts(filteredProducts); // Kategoriye göre filtrelenmiş ürünler
+        } else {
+          setProducts(staticProducts); // Tüm ürünler
+        }
+      } else {
+        console.error("Beklenmeyen yanıt yapısı:", staticProducts);
+        setProducts([]); // Yanıt bir dizi değilse boş dizi ayarla
+      }
+    } catch (error) {
+      console.error("Ürünleri alırken hata oluştu:", error);
+      setProducts([]); // Hata durumunda da boş dizi ayarlayabilirsiniz
     }
   };
 
@@ -193,9 +115,7 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const AuthCheck = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/users/auth", {
-        withCredentials: true,
-      });
+      const response = await axios.get("http://localhost:3000/users/auth");
 
       if (response.status === 200) {
         //Kullanıcı doğrulandı
