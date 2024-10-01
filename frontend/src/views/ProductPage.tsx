@@ -1,14 +1,23 @@
 import "../index.css";
 import "../styles/productPages.css";
 import { useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Product } from "../types/Types";
 
 function ProductPages() {
   const location = useLocation();
   const product = location.state?.product; // Ürünü state'den al
 
+  const [stock, setStock] = useState("");
   const [counter, setCounter] = useState(1);
+
+  useEffect(() => {
+    if (product.quantity > 0) {
+      setStock("In Stock");
+    } else {
+      setStock("No Stock");
+    }
+  }, []);
 
   const shoppingClick = () => {
     console.log("ürün eklendi");
@@ -20,7 +29,7 @@ function ProductPages() {
 
     // Ürünün mevcut olup olmadığını kontrol et
     const existingProductIndex = existingCart.findIndex(
-      (item: Product) => item.id === product.id
+      (item: Product) => item._id === product.id
     );
 
     if (existingProductIndex > -1) {
@@ -47,33 +56,29 @@ function ProductPages() {
             <div className="h-[460px] rounded-lg border-2 border-gray-300  relative">
               <img
                 className="absolute inset-0 w-full bg-white h-full object-scale-down rounded-lg p-4"
-                src={product?.imageUrl}
-                alt={product?.name}
+                src={product.imageUri}
+                alt={product.title}
                 loading="lazy"
               />
             </div>
           </div>
           <div className="md:flex-1 px-4 flex flex-col justify-between ">
             <div className="mb-8 md:mb-0">
-              <h2 className="text-2xl font-bold text-black mb-2">
-                {product?.name}
+              <h2 className="text-2xl font-bold text-black mb-2 text-center">
+                {product.title}
               </h2>
-              <p className="text-black text-md text-justify mb-4">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed
-                ante justo. Integer euismod libero id mauris malesuada
-                tincidunt.
-              </p>
+
               <div className="flex mb-4 justify-between items-center">
                 <div className="flex flex-grow justify-center">
                   <div className="text-center">
-                    <span className="font-bold text-black">Price:</span>
-                    <span className="text-black block">{product?.price}</span>
+                    <span className="font-bold text-black">Availability:</span>
+                    <span className="text-black block">{stock}</span>
                   </div>
                 </div>
                 <div className="flex flex-grow justify-center">
                   <div className="text-center">
-                    <span className="font-bold text-black">Availability:</span>
-                    <span className="text-black block">In Stock</span>
+                    <span className="font-bold text-black">Price:</span>
+                    <span className="text-black block">{product.price}</span>
                   </div>
                 </div>
               </div>
@@ -83,14 +88,7 @@ function ProductPages() {
                   Product Description:
                 </span>
                 <p className="text-black text-md text-justify mt-2">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                  sed ante justo. Integer euismod libero id mauris malesuada
-                  tincidunt. Vivamus commodo nulla ut lorem rhoncus aliquet.
-                  Duis dapibus augue vel ipsum pretium, et venenatis sem
-                  blandit. Quisque ut erat vitae nisi ultrices placerat non eget
-                  velit. Integer ornare mi sed ipsum lacinia, non sagittis
-                  mauris blandit. Morbi fermentum libero vel nisl suscipit, nec
-                  tincidunt mi consectetur.
+                  {product.desc}
                 </p>
               </div>
             </div>

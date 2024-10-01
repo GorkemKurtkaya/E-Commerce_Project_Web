@@ -1,11 +1,12 @@
-import React, { createContext, useState, ReactNode } from "react";
-import { Product, User, Address } from "../types/Types";
+import React, { createContext, ReactNode } from "react";
+import { Product, User, Address, Order } from "../types/Types";
 import axios from "axios";
 
 interface ProductContextType {
-  products: Product[];
-  searchProducts: (query: string) => Product[];
-  fetchProducts: (category: string) => void;
+  // products: Product[];
+  searchProducts: (query: string) => Promise<Product[] | null>;
+  fetchProducts: (category: string) => Promise<Product[] | null>;
+  getProductById: (id: string) => Promise<Product | null>;
   AuthCheck: () => Promise<boolean>;
   fetchUser: (
     email: string,
@@ -27,45 +28,58 @@ interface ProductContextType {
   fetchAddAddress: (id: string) => void;
   fetchUpdateAddress: (id: string, address: string) => void;
   fetchDeleteAddress: (address: string) => void;
+  fetchGetAllOrders: () => Promise<Order[] | null>;
+  fetchGetOrderById: (id: string) => Promise<Order | null>;
   fetchUserLogOut: () => Promise<boolean>;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [products, setProducts] = useState<Product[]>([]);
-
-  const fetchProducts = async (category: string) => {
+  const fetchProducts = async (category: string): Promise<Product[] | null> => {
     try {
       const response = await axios.get("http://localhost:3000/product/");
-      console.log(response.data);
-      const staticProducts = response.data;
-      console.log(staticProducts);
+      const products: Product[] = response.data;
 
-      if (Array.isArray(staticProducts)) {
-        // staticProducts bir dizi mi kontrolü
-        if (category !== "") {
-          const filteredProducts = staticProducts.filter(
-            (product) => product.category === category
-          );
-          setProducts(filteredProducts); // Kategoriye göre filtrelenmiş ürünler
-        } else {
-          setProducts(staticProducts); // Tüm ürünler
-        }
+      if (Array.isArray(products)) {
+        return category
+          ? products.filter((product) => product.category[0] === category) // Filtered products
+          : products; // All products
       } else {
-        console.error("Beklenmeyen yanıt yapısı:", staticProducts);
-        setProducts([]); // Yanıt bir dizi değilse boş dizi ayarla
+        console.error("Unexpected response structure:", products);
+        return null; // Not an array
       }
     } catch (error) {
-      console.error("Ürünleri alırken hata oluştu:", error);
-      setProducts([]); // Hata durumunda da boş dizi ayarlayabilirsiniz
+      console.error("Error fetching products:", error);
+      return null;
     }
   };
 
-  const searchProducts = (query: string): Product[] => {
-    return products.filter((product) => {
-      return product.name.toLowerCase().includes(query.toLowerCase());
-    });
+  const searchProducts = async (query: string): Promise<Product[]> => {
+    if (!query) return []; // Return empty array if query is empty
+    const products = await fetchProducts(""); // Fetch all products
+
+    // Use optional chaining and provide a default empty array
+    return (
+      products?.filter((product) =>
+        product.title.toLowerCase().includes(query.toLowerCase())
+      ) || [] // Always return an array
+    );
+  };
+
+  const getProductById = async (id: string): Promise<Product | null> => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/product/find/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.log("Hata", error);
+      return null;
+    }
   };
 
   const fetchSignupUser = async (
@@ -115,7 +129,9 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const AuthCheck = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/users/auth");
+      const response = await axios.get("http://localhost:3000/users/auth", {
+        withCredentials: true,
+      });
 
       if (response.status === 200) {
         //Kullanıcı doğrulandı
@@ -206,7 +222,7 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const fetchChangeName = async (name: string) => {
     try {
-      const response = axios.put(
+      const response = await axios.put(
         "http://localhost:3000/users/changeName",
         {
           name: name,
@@ -242,7 +258,7 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const fetchAddAddress = async (newAddress: string) => {
     try {
-      const response = axios.post(
+      const response = await axios.post(
         "http://localhost:3000/users/addAddress",
         {
           address: newAddress,
@@ -259,7 +275,7 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const fetchDeleteAddress = async (id: string) => {
     try {
-      const response = axios.delete(
+      const response = await axios.delete(
         `http://localhost:3000/users/adresSil/${id}`,
         {
           withCredentials: true,
@@ -273,7 +289,7 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const fetchUpdateAddress = async (id: string, address: string) => {
     try {
-      const response = axios.put(
+      const response = await axios.put(
         `http://localhost:3000/users/adresGuncelle/${id}`,
         {
           address: address,
@@ -288,16 +304,50 @@ const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  const fetchGetAllOrders = async (): Promise<Order[] | null> => {
+    try {
+      const id = await fetchUserId();
+      const response = await axios.get(
+        `http://localhost:3000/orders/find/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.log("Siparişleri Görüntülerken Bir Hata Oluştu", error);
+      return null;
+    }
+  };
+
+  const fetchGetOrderById = async (id: string): Promise<Order | null> => {
+    console.log(id);
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/orders/find/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.log("Hata", error);
+      return null;
+    }
+  };
   return (
     <ProductContext.Provider
       value={{
-        products,
         fetchUserId,
         AuthCheck,
         fetchChangeName,
         fetchGetAdresses,
+        getProductById,
         fetchUpdateAddress,
         fetchDeleteAddress,
+        fetchGetAllOrders,
+        fetchGetOrderById,
         fetchAddAddress,
         fetchProducts,
         fetchUser,
