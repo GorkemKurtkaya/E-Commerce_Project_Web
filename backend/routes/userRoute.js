@@ -16,7 +16,12 @@ router.get("/checkUser", checkUser, (req, res) => {
 });
 
 router.get("/auth", authMiddleWare.authenticateToken, (req, res) => {
-  res.status(200).send("Authenticated");
+  if(res.locals.user){
+    res.status(200).send("Authenticated");
+  }else{
+    res.status(401).send("Unauthorized");
+  }
+
 });
 
 router.get("/cook", (req, res) => {

@@ -42,6 +42,7 @@ const authenticateToken = async (req, res, next) => {
         }
       });
     } else {
+      res.status(401).send("Access denied");
     }
   } catch (error) {
     res.status(401).send("Access denied");
