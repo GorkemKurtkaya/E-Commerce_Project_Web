@@ -43,7 +43,7 @@ const createProduct = async (req, res) => {
 
         res.status(201).json({
             succeeded: true,
-            Order: {
+            Product: {
                 title: req.body.title,
                 desc:req.body.desc,
                 category: req.body.category,
