@@ -1,4 +1,4 @@
-# Baskı Sanatı E-Ticaret Sitesi
+#  E-Ticaret Sitesi
 
 Bu proje, **Görkem Kurtkaya** ve **Ömer Fikri Gülcemal** tarafından geliştirilen bir e-ticaret sitesidir. **Ömer Fikri Gülcemal**, frontend kısmını geliştirirken **Görkem Kurtkaya**, backend kısmını geliştirmiştir.
 
