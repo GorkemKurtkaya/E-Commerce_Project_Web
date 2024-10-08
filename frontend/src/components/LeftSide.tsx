@@ -7,7 +7,7 @@ function LeftSide() {
         <div className="flex flex-col h-full">
           <div className="flex-1 flex items-center justify-center">
             <img
-              src="src/assets/vector.jpg"
+              src="src/assets/logo.png"
               alt="Logo"
               className="h-auto max-w-xs object-contain"
             />

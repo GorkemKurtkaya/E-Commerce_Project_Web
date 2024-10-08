@@ -112,7 +112,7 @@
 //           <div className="flex flex-1 justify-start flex-shrink-0 items-center gap-4">
 //             <img
 //               className="block h-12 w-auto max-w-full object-contain"
-//               src="src/assets/vector.jpg"
+//               src="src/assets/logo.png"
 //               alt="Logo"
 //             />
 //           </div>

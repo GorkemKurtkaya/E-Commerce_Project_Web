@@ -26,6 +26,7 @@ coverage/
 
 # dotenv environment variables file
 .env
+.env.local
 
 # Optional npm cache directory
 .npm
@@ -51,3 +52,9 @@ Thumbs.db
 
 # Testing
 coverage/
+*.test.js
+
+# Other sensitive files (config, etc.)
+*.pem
+*.key
+*.crt
