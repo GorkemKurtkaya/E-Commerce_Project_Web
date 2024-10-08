@@ -13,8 +13,7 @@ Bu proje, **Görkem Kurtkaya** ve **Ömer Fikri Gülcemal** tarafından gelişti
 3. [Kullanıcı Özellikleri](#kullanıcı-özellikleri)
 4. [Admin Paneli](#admin-paneli)
 5. [Teknolojiler](#teknolojiler)
-6. [Ekran Görüntüleri](#ekran-görüntüleri)
-7. [Geliştiriciler](#geliştiriciler)
+6. [Geliştiriciler](#geliştiriciler)
 
 ---
 
@@ -60,7 +59,7 @@ CLOUDINARY_URL=your_cloudinary_url
 nodemon app.js
 ``` 
 
-### Backend Kurulumu
+### Frontend Kurulumu
 
 Aşağıdaki adımları izleyerek frontend kısmını kurabilirsiniz:
 
@@ -173,8 +172,8 @@ Bu projede kullanılan başlıca teknolojiler şunlardır:
 
 Backend ve frontend kodlarına GitHub üzerinden ulaşabilirsiniz:
 
-- [Backend Repository]([https://github.com/GorkemKurtkaya/Project_Web](https://github.com/GorkemKurtkaya/E-Commerce_Project_Web/tree/main/backend))
-- [Frontend Repository]([https://github.com/GorkemKurtkaya/Project_Web](https://github.com/GorkemKurtkaya/E-Commerce_Project_Web/tree/main/frontend))
+- [Backend Repository](https://github.com/GorkemKurtkaya/E-Commerce_Project_Web/tree/main/backend)
+- [Frontend Repository](https://github.com/GorkemKurtkaya/E-Commerce_Project_Web/tree/main/frontend)
 
 # ISC Lisansı
 
