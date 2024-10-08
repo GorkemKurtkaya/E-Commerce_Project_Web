@@ -1,7 +1,7 @@
-function Success(){
-    return(
-    <div>AFERİN</div>
-)
-}
+// function Success(){
+//     return(
+//     <div>AFERİN</div>
+// )
+// }
 
-export default Success;
+// export default Success;

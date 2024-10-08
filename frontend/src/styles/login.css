@@ -1,5 +1,5 @@
  .login {
-  flex: 1;  Ana içeriğin geri kalan tüm boşluğu kaplamasını sağlar 
+   flex: 1;  /*Ana içeriğin geri kalan tüm boşluğu kaplamasını sağlar  */
   display: flex;
   flex-direction: column;
   padding: 1rem; /* İçeriğin etrafına padding ekler */

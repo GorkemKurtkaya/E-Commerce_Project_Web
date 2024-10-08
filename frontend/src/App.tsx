@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 
-import Success from "./components/paymentComponents/Success";
-import Pay from "./components/paymentComponents/Pay";
+
+
 import Home from "./views/Home";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -15,6 +15,12 @@ import PurchasedProductsItem from "./views/PurchasedProductsItem";
 import Admin from "./views/Admin";
 import { ProductContext } from "./context/context";
 import { useContext, useEffect, useState } from "react";
+
+
+
+
+
+
 
 import "./App.css";
 import "./index.css";
@@ -69,8 +75,7 @@ function App() {
           <Route path="/conditions" element={<Conditions />} />
           <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/shopping" element={<Shopping />} />
-          <Route path="/pay" element={<Pay/>} />
-          <Route path="/success" element={<Success/>} />
+
 
           
           

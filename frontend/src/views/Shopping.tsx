@@ -2,10 +2,35 @@ import "../index.css";
 import { useState, useEffect } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { Product } from "../types/Types";
+import StripeCheckout,{Token} from 'react-stripe-checkout';
+import axios from 'axios';
+
+const KEY="pk_test_51Q41AnL29TlMF7zj15Jo4L8sHiaeDbu5Hxpdk4N4FjhZEpeuPyOjaUeeTBDy3ZZwAr8cES75eSfNlgS31x2PbHlV00iINfIQoS"
 
 function Shopping() {
   const [products, setProducts] = useState<Product[]>([]);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
+
+  const [stripeToken, setStripeToken] = useState<Token | null>(null);
+
+    const onToken = (token: Token) => {
+        setStripeToken(token);
+      };
+
+    useEffect(()=>{
+        const makeRequest= async()=>{
+            try{
+                const res =await axios.post("http://localhost:3000/checkout/payment",{
+                    tokenId: stripeToken?.id,
+                    amount:2000,
+                })
+                console.log(res.data);
+            }catch(err){
+                console.log(err)
+            }
+        };
+        stripeToken && makeRequest
+    },[stripeToken])
 
   useEffect(() => {
     const getProductsCount = () => {
@@ -206,9 +231,22 @@ function Shopping() {
                   ).toFixed(2)}
                 </span>
               </div>
-              <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mt-4 w-full">
-                Checkout
-              </button>
+              <div style={{
+            height:"100vh",
+            display:"flex",
+            alignItems:"center",
+            justifyContent:"center"
+        }}
+        >
+            <StripeCheckout name='Gorkem Shop' image='https://avatars.githubusercontent.com/u/115563271?v=4' billingAddress shippingAddress
+            description='Your Total is 20TL'
+            amount={2000}
+            token={onToken}
+            stripeKey={KEY}>
+
+            
+            </StripeCheckout>
+        </div>
             </div>
           </div>
         </div>
