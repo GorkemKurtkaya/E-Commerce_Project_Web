@@ -173,8 +173,8 @@ Bu projede kullanılan başlıca teknolojiler şunlardır:
 
 Backend ve frontend kodlarına GitHub üzerinden ulaşabilirsiniz:
 
-- [Backend Repository]([https://github.com/GorkemKurtkaya/Project_Web](https://github.com/GorkemKurtkaya/Project_Web/tree/main/backend))
-- [Frontend Repository]([https://github.com/GorkemKurtkaya/Project_Web](https://github.com/GorkemKurtkaya/Project_Web/tree/main/frontend))
+- [Backend Repository]([https://github.com/GorkemKurtkaya/Project_Web](https://github.com/GorkemKurtkaya/E-Commerce_Project_Web/tree/main/backend))
+- [Frontend Repository]([https://github.com/GorkemKurtkaya/Project_Web](https://github.com/GorkemKurtkaya/E-Commerce_Project_Web/tree/main/frontend))
 
 # ISC Lisansı
 
